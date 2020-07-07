@@ -1,2 +1,1 @@
-# ssl.github.io
-github cdn host
+# redex55.github.io

@@ -1,0 +1,3624 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Die Stämme - Support Planner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: rgba(15, 23, 42, 0.9);
+            border-right: 1px solid rgba(71, 85, 105, 0.3);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            color: #f59e0b;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .tab-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tab-item {
+            margin: 5px 10px;
+        }
+
+        .tab-button {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(71, 85, 105, 0.2);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 8px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-button:hover {
+            background: rgba(71, 85, 105, 0.4);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-color: #f59e0b;
+            color: white;
+            font-weight: 600;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+            max-width: calc(1400px - 250px);
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+        
+        .container {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        h2 {
+            color: #f59e0b;
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        textarea {
+            width: calc(100% - 4px);
+            height: 200px;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.4);
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            resize: vertical;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+        
+        .config-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .config-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        input[type="number"], input[type="text"] {
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.4);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results {
+            margin-top: 30px;
+        }
+        
+        .attack-plan {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .attack-plan:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .attack-header {
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .attack-details {
+            margin-bottom: 15px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        
+        .support-list {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            border-radius: 0 12px 12px 0;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .support-item {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .support-item:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateX(5px);
+        }
+        
+        .timing-info {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(71, 85, 105, 0.2);
+        }
+        
+        .error {
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            backdrop-filter: blur(5px);
+        }
+        
+        .success {
+            color: #86efac;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            backdrop-filter: blur(5px);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .stat-item {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 5px;
+        }
+        
+        .button-group {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            font-size: 14px;
+            padding: 12px 24px;
+            margin: 0 8px;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+        
+        /* Selection styling */
+        ::selection {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fff;
+        }
+        
+        /* Media queries for responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+
+            .config-section {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Die Stämme Tools</div>
+            </div>
+            <ul class="tab-list">
+                <li class="tab-item">
+                    <button class="tab-button active" onclick="switchPage('support-planner')">
+                        <span>🏰</span>
+                        <span>Support Planner</span>
+                    </button>
+                </li>
+                <li class="tab-item">
+                    <button class="tab-button" onclick="switchPage('page2')">
+                        <span>🛡️</span>
+                        <span>Tab Planner</span>
+                    </button>
+                </li>
+                <li class="tab-item">
+                    <button class="tab-button" onclick="switchPage('page3')">
+                        <span>⚔️</span>
+                        <span>Tool 3</span>
+                    </button>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div id="support-planner" class="page active">
+                <h1>🏰 Die Stämme - Support Planner</h1>
+
+                <div class="container">
+                    <div class="input-section">
+                        <div class="input-group">
+                            <label for="planInput">Adelsplan:</label>
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; min-height: 28px;">
+                                <input type="radio" id="bbFormat" name="planFormat" value="bb" checked onchange="togglePlanFormat()">
+                                <label for="bbFormat" style="margin-right: 20px; font-weight: normal;">BB-Code Format</label>
+                                <input type="radio" id="dswFormat" name="planFormat" value="dsw" onchange="togglePlanFormat()">
+                                <label for="dswFormat" style="font-weight: normal;">DS Workbench Format</label>
+                            </div>
+                            <textarea id="planInput" placeholder="Fügen Sie hier Ihren Adelsplan ein..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="troopsInput">Truppen-Übersicht:</label>
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; min-height: 28px;">
+                                <input type="radio" id="standardTroopFormat" name="troopFormat" value="standard" checked onchange="toggleTroopFormat()">
+                                <label for="standardTroopFormat" style="margin-right: 20px; font-weight: normal;">Standard Format</label>
+                                <input type="radio" id="tribeTroopFormat" name="troopFormat" value="tribe" onchange="toggleTroopFormat()">
+                                <label for="tribeTroopFormat" style="font-weight: normal;">Tribe Info Format</label>
+                                <input type="file" id="tribeInfoFileInput" accept=".txt" style="display: none;" onchange="handleTribeInfoFile(event)">
+                                <button onclick="document.getElementById('tribeInfoFileInput').click()" style="margin: 0 0 0 10px; padding: 4px 10px; font-size: 11px; background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; border: none; border-radius: 4px; color: white;">
+                                    📁 tribe_info.txt hochladen
+                                </button>
+                                <span id="fileUploadStatus" style="margin-left: 10px; font-size: 11px; color: #10b981;"></span>
+                            </div>
+                            <textarea id="troopsInput" placeholder="Fügen Sie hier Ihre Truppen-Übersicht ein..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="config-group">
+                            <label for="worldInput">Welt:</label>
+                            <input type="text" id="worldInput" value="de230" placeholder="z.B. de230">
+                            <button onclick="loadVillageData()" style="margin-top: 10px; padding: 8px 16px; font-size: 12px;">Dorfdata laden</button>
+                            <button onclick="showManualInput()" style="margin-top: 5px; padding: 6px 12px; font-size: 11px; background: linear-gradient(135deg, #6366f1, #4f46e5);">Manuell eingeben</button>
+                        </div>
+                        <div class="config-group">
+                            <label for="totalSpears">Gesamt Speerkämpfer:</label>
+                            <input type="number" id="totalSpears" value="1000" min="0">
+                        </div>
+                        <div class="config-group">
+                            <label for="totalSwords">Gesamt Schwertkämpfer:</label>
+                            <input type="number" id="totalSwords" value="1000" min="0">
+                        </div>
+                        <div class="config-group">
+                            <label for="totalHeavy">Gesamt Schwere Kavalerie:</label>
+                            <input type="number" id="totalHeavy" value="500" min="0">
+                        </div>
+                        <div class="config-group">
+                            <label for="maxDistance">Max. Entfernung:</label>
+                            <input type="number" id="maxDistance" value="30" min="5" max="100">
+                        </div>
+                        <div class="config-group">
+                            <label for="maxTimeDiff">Max. Zeitunterschied (min):</label>
+                            <input type="number" id="maxTimeDiff" value="999999" min="0" placeholder="z.B. 120">
+                        </div>
+                        <div class="config-group">
+                            <label for="fakeSupports">Anzahl Fake-Supports:</label>
+                            <input type="number" id="fakeSupports" value="0" min="0" placeholder="z.B. 5">
+                        </div>
+                        <div class="config-group" style="grid-column: span 2;">
+                            <label>Fake-Support Einheiten (mehrere auswählbar):</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px;">
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="fakeUnitCheckbox" value="spear" checked style="margin-right: 8px; cursor: pointer;">
+                                    Speerkämpfer
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="fakeUnitCheckbox" value="sword" style="margin-right: 8px; cursor: pointer;">
+                                    Schwertkämpfer
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="fakeUnitCheckbox" value="axe" style="margin-right: 8px; cursor: pointer;">
+                                    Axtkämpfer
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="fakeUnitCheckbox" value="spy" style="margin-right: 8px; cursor: pointer;">
+                                    Späher
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="fakeUnitCheckbox" value="light" style="margin-right: 8px; cursor: pointer;">
+                                    Leichte Kavallerie
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" class="fakeUnitCheckbox" value="heavy" style="margin-right: 8px; cursor: pointer;">
+                                    Schwere Kavallerie
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="calculateSupport()">Support berechnen</button>
+                        <button onclick="clearAll()">Alles zurücksetzen</button>
+                    </div>
+
+                    <!-- Manual input modal (hidden by default) -->
+                    <div id="manualInputModal" onclick="hideManualInput()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+                        <div onclick="event.stopPropagation();" style="background: rgba(30, 41, 59, 0.95); padding: 30px; border-radius: 16px; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto; backdrop-filter: blur(10px); border: 1px solid rgba(71, 85, 105, 0.3);">
+                            <h3 style="color: #f59e0b; margin-bottom: 20px;">📝 Manuelle Dorfdata-Eingabe</h3>
+                            <p id="manualInstructions" style="color: #cbd5e1; margin-bottom: 15px; line-height: 1.5;">
+                                <strong>Anleitung:</strong><br>
+                                1. Öffnen Sie <strong>https://de230.die-staemme.de/map/village.txt</strong> in einem neuen Tab<br>
+                                2. Kopieren Sie den kompletten Inhalt (Strg+A, dann Strg+C)<br>
+                                3. Fügen Sie ihn in das Textfeld unten ein<br>
+                                4. Klicken Sie auf "Daten laden"
+                            </p>
+                            <textarea id="manualVillageData" placeholder="Fügen Sie hier die CSV-Daten ein..." style="width: 100%; height: 200px; font-family: monospace; font-size: 11px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(71, 85, 105, 0.4); border-radius: 8px; color: #e2e8f0; padding: 10px;"></textarea>
+                            <div style="margin-top: 15px; text-align: center;">
+                                <button onclick="loadManualVillageData()" style="margin-right: 10px;">Daten laden</button>
+                                <button onclick="hideManualInput()" style="background: linear-gradient(135deg, #6b7280, #4b5563);">Abbrechen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="villageDataStatus" class="container" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
+                    <h2 style="color: #3b82f6; border-color: #3b82f6;">📊 Dorfdata Status</h2>
+                    <p id="villageDataInfo" style="color: #cbd5e1; line-height: 1.6;">
+                        Noch keine Dorfdata geladen. Klicken Sie auf "Dorfdata laden" um die aktuellen Dorfkoordinaten zu laden.
+                    </p>
+                </div>
+
+                <div class="container" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+                    <h2 style="color: #10b981; border-color: #10b981;">💡 Timing-Optimierung</h2>
+                    <p style="color: #cbd5e1; line-height: 1.6;">
+                        Das Tool fügt automatisch einen <strong>Rammbock</strong> oder <strong>Katapult</strong> zu Support-Truppen hinzu,
+                        wenn dadurch bessere Timing-Ergebnisse erzielt werden. Diese langsameren Einheiten (30 min/Feld)
+                        ermöglichen es, Support näher zum Adel-Start zu senden und damit die Koordination zu verbessern.
+                    </p>
+                </div>
+
+                <div class="container" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
+                    <h2 style="color: #3b82f6; border-color: #3b82f6;">🔧 DS Workbench Integration</h2>
+                    <p style="color: #cbd5e1; line-height: 1.6;">
+                        Das Tool unterstützt jetzt sowohl <strong>BB-Code</strong> als auch <strong>DS Workbench</strong> Format für Input und Export.
+                        Wählen Sie das gewünschte Format über die Optionsfelder aus. DS Workbench Format ermöglicht präzise
+                        Timing-Koordination und direkten Import in externe Tools.<br><br>
+                        <strong>🎯 Echte Dorf-IDs:</strong> Mit der Dorfdata-Integration werden die korrekten Dorf-IDs vom Spielserver geladen
+                        und in DS Workbench Exporten verwendet. Dies gewährleistet 100% Kompatibilität mit allen DS Workbench Tools.<br><br>
+                        <strong>⚠️ CORS-Hinweis:</strong> Aufgrund von Browser-Sicherheitsmaßnahmen kann die automatische Dorfdata-Ladung
+                        fehlschlagen. Verwenden Sie in diesem Fall die manuelle Eingabe-Option.
+                    </p>
+                </div>
+
+                <div id="results" class="results"></div>
+            </div>
+
+            <div id="page2" class="page">
+                <h1>🛡️ Tab Planner</h1>
+
+                <div class="container">
+                    <div class="input-section">
+                        <div class="input-group">
+                            <label for="sosInput">SOS-Daten (aus Stammesübersicht):</label>
+                            <textarea id="sosInput" placeholder="Fügen Sie hier die SOS-Daten aus der Stammesübersicht ein..."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="defTroopsInput">Verfügbare Truppen:</label>
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; min-height: 28px;">
+                                <input type="radio" id="defStandardFormat" name="defTroopFormat" value="standard" checked onchange="toggleDefTroopFormat()">
+                                <label for="defStandardFormat" style="margin-right: 20px; font-weight: normal;">Standard Format</label>
+                                <input type="radio" id="defTribeFormat" name="defTroopFormat" value="tribe" onchange="toggleDefTroopFormat()">
+                                <label for="defTribeFormat" style="font-weight: normal;">Tribe Info Format</label>
+                                <input type="file" id="defTribeInfoFileInput" accept=".txt" style="display: none;" onchange="handleDefTribeInfoFile(event)">
+                                <button onclick="document.getElementById('defTribeInfoFileInput').click()" style="margin: 0 0 0 10px; padding: 4px 10px; font-size: 11px; background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; border: none; border-radius: 4px; color: white;">
+                                    📁 tribe_info.txt hochladen
+                                </button>
+                                <span id="defFileUploadStatus" style="margin-left: 10px; font-size: 11px; color: #10b981;"></span>
+                            </div>
+                            <textarea id="defTroopsInput" placeholder="Fügen Sie hier Ihre Truppen-Übersicht ein..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <div class="config-group">
+                            <label for="defWorldInput">Welt:</label>
+                            <input type="text" id="defWorldInput" value="de230" placeholder="z.B. de230">
+                        </div>
+                        <div class="config-group">
+                            <label for="defMinTimeBefore">Min. Zeit vor Angriff (min):</label>
+                            <input type="number" id="defMinTimeBefore" value="5" min="0" placeholder="z.B. 5">
+                        </div>
+                        <div class="config-group">
+                            <label for="defSupportSpears">Speerkämpfer pro Support:</label>
+                            <input type="number" id="defSupportSpears" value="100" min="0">
+                        </div>
+                        <div class="config-group">
+                            <label for="defSupportSwords">Schwertkämpfer pro Support:</label>
+                            <input type="number" id="defSupportSwords" value="100" min="0">
+                        </div>
+                        <div class="config-group">
+                            <label for="defSupportHeavy">Schwere Kavallerie pro Support:</label>
+                            <input type="number" id="defSupportHeavy" value="50" min="0">
+                        </div>
+                        <div class="config-group">
+                            <label>
+                                <input type="checkbox" id="defUseTimeOptimization" checked style="margin-right: 8px; cursor: pointer;">
+                                Zeit-Optimierung (1 Rammbock/Katapult)
+                            </label>
+                            <small style="color: #94a3b8; margin-top: 5px; display: block; line-height: 1.4;">
+                                Fügt automatisch einen Rammbock oder Katapult hinzu, um früher zu senden und mehr Zeitpuffer zu haben.
+                            </small>
+                        </div>
+                        <div class="config-group" style="grid-column: span 2;">
+                            <label>Output Format:</label>
+                            <div style="display: flex; gap: 20px; margin-top: 8px;">
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" id="defBBOutput" name="defOutputFormat" value="bb" checked style="margin-right: 8px; cursor: pointer;">
+                                    BB-Code Format
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" id="defDSWOutput" name="defOutputFormat" value="dsw" style="margin-right: 8px; cursor: pointer;">
+                                    DS Workbench Format
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="calculateDefenseSupport()">Support berechnen</button>
+                        <button onclick="clearDefense()">Alles zurücksetzen</button>
+                    </div>
+                </div>
+
+                <div class="container" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
+                    <h2 style="color: #3b82f6; border-color: #3b82f6;">ℹ️ Anleitung</h2>
+                    <p style="color: #cbd5e1; line-height: 1.6;">
+                        <strong>1. SOS-Daten:</strong> Kopieren Sie die SOS-Daten aus der Stammesübersicht. Das Tool erkennt automatisch angegriffene Dörfer und Ankunftszeiten.<br>
+                        <strong>2. Truppen:</strong> Fügen Sie Ihre verfügbaren Truppen ein (Standard- oder Tribe Info Format).<br>
+                        <strong>3. Konfiguration:</strong> Geben Sie an, wie viele Truppen pro Support gesendet werden sollen und wie viel Zeit vor dem Angriff mindestens sein muss.<br>
+                        <strong>4. Zeit-Optimierung:</strong> Das Tool fügt automatisch einen <strong>Rammbock</strong> oder <strong>Katapult</strong> zu Support-Truppen hinzu, um früher zu senden und mehr Zeitpuffer zu haben (optional).<br>
+                        <strong>5. Berechnung:</strong> Das Tool generiert für jeden Angriff einen Support, der exakt zur gleichen Zeit wie der Angriff ankommt.<br><br>
+                        <strong>⏱️ Timing:</strong> Supports werden so berechnet, dass sie genau zur Ankunftszeit des Angriffs ankommen. Supports, die zu spät gesendet werden müssten, werden markiert.
+                    </p>
+                </div>
+
+                <div id="defResults" class="results"></div>
+            </div>
+
+            <div id="page3" class="page">
+                <div class="container">
+                    <h1>⚔️ Tool 3</h1>
+                    <p style="color: #cbd5e1; font-size: 1.1rem; line-height: 1.8;">
+                        This is a placeholder for the third tool. Add your functionality here.
+                    </p>
+                    <div class="container" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); margin-top: 20px;">
+                        <h2 style="color: #10b981; border-color: #10b981;">⚡ Capabilities</h2>
+                        <ul style="color: #cbd5e1; line-height: 1.8;">
+                            <li>Capability 1 coming soon</li>
+                            <li>Capability 2 coming soon</li>
+                            <li>Capability 3 coming soon</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.closest('.tab-button').classList.add('active');
+        }
+
+        // Unit speeds in minutes per field
+        const UNIT_SPEEDS = {
+            spear: 18,
+            sword: 22,
+            axe: 18,
+            archer: 18,
+            spy: 9,
+            light: 10,
+            marcher: 18,
+            heavy: 11,
+            ram: 30,
+            catapult: 30,
+            knight: 10,
+            snob: 35
+        };
+
+        // DS Workbench Integration
+        const ATTACK_TYPES = {
+            '8': 'attack',
+            '11': 'conquest',
+            '14': 'fake',
+            '45': 'wallbreaker',
+            '0': 'support',
+            '1': 'standSupport', 
+            '7': 'fastSupport',
+            '46': 'fakeSupport',
+            '18': 'blue',
+        };
+
+        const ATTACK_TYPES_REVERSE = Object.fromEntries(
+            Object.entries(ATTACK_TYPES).map(([key, value]) => [value, key])
+        );
+
+        // Village data management class with server integration and caching
+        class VillageDataManager {
+            constructor() {
+                this.villageData = new Map(); // village_id -> {name, x, y, player_id, points}
+                this.coordsToVillageId = new Map(); // "x,y" -> village_id
+                this.villageNameToId = new Map(); // village_name -> village_id
+                this.playerVillages = new Map(); // player_id -> Set of village_ids
+                this.lastUpdated = null;
+                this.world = null;
+                this.isLoading = false;
+                
+                // Try to load cached data on initialization
+                this.loadFromCache();
+            }
+
+            // Generate world URL
+            getWorldUrl(world) {
+                return `https://${world}.die-staemme.de/map/village.txt`;
+            }
+
+            // Parse village data from CSV
+            parseVillageData(csvData) {
+                const lines = csvData.trim().split('\n');
+                const villages = new Map();
+                const coordsMap = new Map();
+                const nameMap = new Map();
+                const playerMap = new Map();
+
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    
+                    const parts = line.split(',');
+                    if (parts.length < 6) continue;
+
+                    const villageId = parseInt(parts[0]);
+                    const villageName = parts[1];
+                    const x = parseInt(parts[2]);
+                    const y = parseInt(parts[3]);
+                    const playerId = parseInt(parts[4]);
+                    const points = parseInt(parts[5]);
+
+                    // Store village data
+                    const villageInfo = {
+                        id: villageId,
+                        name: villageName,
+                        x: x,
+                        y: y,
+                        playerId: playerId,
+                        points: points
+                    };
+
+                    villages.set(villageId, villageInfo);
+                    coordsMap.set(`${x},${y}`, villageId);
+                    nameMap.set(villageName, villageId);
+
+                    // Group by player
+                    if (!playerMap.has(playerId)) {
+                        playerMap.set(playerId, new Set());
+                    }
+                    playerMap.get(playerId).add(villageId);
+                }
+
+                return {
+                    villages,
+                    coordsMap,
+                    nameMap,
+                    playerMap
+                };
+            }
+
+            // Load village data from server
+            async loadVillageData(world) {
+                if (this.isLoading) return false;
+                
+                this.isLoading = true;
+                
+                try {
+                    const url = this.getWorldUrl(world);
+                    console.log(`Loading village data from: ${url}`);
+                    
+                    // Try direct fetch first
+                    let response;
+                    try {
+                        response = await fetch(url);
+                    } catch (corsError) {
+                        console.warn('Direct fetch failed, trying CORS proxy...');
+                        
+                        // Try with CORS proxy
+                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                        response = await fetch(proxyUrl);
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const csvData = await response.text();
+                    
+                    // Validate CSV format
+                    if (!csvData.includes(',') || csvData.length < 100) {
+                        throw new Error('Ungültiges CSV-Format oder leere Antwort');
+                    }
+                    
+                    const parsedData = this.parseVillageData(csvData);
+
+                    // Update all maps
+                    this.villageData = parsedData.villages;
+                    this.coordsToVillageId = parsedData.coordsMap;
+                    this.villageNameToId = parsedData.nameMap;
+                    this.playerVillages = parsedData.playerMap;
+                    this.lastUpdated = new Date();
+                    this.world = world;
+
+                    // Cache the data
+                    this.saveToCache();
+
+                    console.log(`Loaded ${this.villageData.size} villages for world ${world}`);
+                    return true;
+                } catch (error) {
+                    console.error('Error loading village data:', error);
+                    throw error;
+                } finally {
+                    this.isLoading = false;
+                }
+            }
+
+            // Load village data from manual input
+            loadVillageDataFromText(csvData, world) {
+                try {
+                    if (!csvData || csvData.trim().length === 0) {
+                        throw new Error('Keine CSV-Daten bereitgestellt');
+                    }
+                    
+                    const parsedData = this.parseVillageData(csvData);
+                    
+                    this.villageData = parsedData.villages;
+                    this.coordsToVillageId = parsedData.coordsMap;
+                    this.villageNameToId = parsedData.nameMap;
+                    this.playerVillages = parsedData.playerMap;
+                    this.lastUpdated = new Date();
+                    this.world = world;
+
+                    // Cache the data
+                    this.saveToCache();
+
+                    console.log(`Loaded ${this.villageData.size} villages for world ${world} from manual input`);
+                    return true;
+                } catch (error) {
+                    console.error('Error loading village data from text:', error);
+                    throw error;
+                }
+            }
+
+            // Save to localStorage cache
+            saveToCache() {
+                try {
+                    const cacheData = {
+                        world: this.world,
+                        lastUpdated: this.lastUpdated?.toISOString(),
+                        villages: Array.from(this.villageData.entries()),
+                        coordsMap: Array.from(this.coordsToVillageId.entries()),
+                        nameMap: Array.from(this.villageNameToId.entries()),
+                        playerMap: Array.from(this.playerVillages.entries()).map(([playerId, villageSet]) => 
+                            [playerId, Array.from(villageSet)]
+                        )
+                    };
+                    
+                    localStorage.setItem('tw_village_data', JSON.stringify(cacheData));
+                    console.log('Village data cached successfully');
+                } catch (error) {
+                    console.warn('Failed to cache village data:', error);
+                }
+            }
+
+            // Load from localStorage cache
+            loadFromCache() {
+                try {
+                    const cachedData = localStorage.getItem('tw_village_data');
+                    if (!cachedData) return false;
+
+                    const data = JSON.parse(cachedData);
+                    
+                    // Check if cache is not too old (24 hours)
+                    const cacheAge = Date.now() - new Date(data.lastUpdated).getTime();
+                    if (cacheAge > 24 * 60 * 60 * 1000) {
+                        console.log('Cache is too old, will need to refresh');
+                        return false;
+                    }
+
+                    this.world = data.world;
+                    this.lastUpdated = new Date(data.lastUpdated);
+                    this.villageData = new Map(data.villages);
+                    this.coordsToVillageId = new Map(data.coordsMap);
+                    this.villageNameToId = new Map(data.nameMap);
+                    this.playerVillages = new Map(
+                        data.playerMap.map(([playerId, villageArray]) => [playerId, new Set(villageArray)])
+                    );
+
+                    console.log(`Loaded ${this.villageData.size} villages from cache for world ${this.world}`);
+                    return true;
+                } catch (error) {
+                    console.warn('Failed to load cached village data:', error);
+                    return false;
+                }
+            }
+
+            // Clear cache
+            clearCache() {
+                localStorage.removeItem('tw_village_data');
+                this.villageData.clear();
+                this.coordsToVillageId.clear();
+                this.villageNameToId.clear();
+                this.playerVillages.clear();
+                this.lastUpdated = null;
+                this.world = null;
+            }
+
+            // Lookup functions
+            getVillageById(villageId) {
+                return this.villageData.get(villageId);
+            }
+
+            getVillageByCoords(x, y) {
+                const villageId = this.coordsToVillageId.get(`${x},${y}`);
+                return villageId ? this.villageData.get(villageId) : null;
+            }
+
+            getVillageNameByCoords(x, y) {
+                const village = this.getVillageByCoords(x, y);
+                return village ? village.name : null;
+            }
+
+            getVillageByName(villageName) {
+                const villageId = this.villageNameToId.get(villageName);
+                return villageId ? this.villageData.get(villageId) : null;
+            }
+
+            getVillagesByPlayer(playerId) {
+                const villageIds = this.playerVillages.get(playerId);
+                if (!villageIds) return [];
+                
+                return Array.from(villageIds).map(id => this.villageData.get(id));
+            }
+
+            // Coordinate conversion functions
+            coordinatesToVillageId(x, y) {
+                if (typeof x === 'string' && x.includes('|')) {
+                    const [xStr, yStr] = x.split('|');
+                    return this.coordsToVillageId.get(`${xStr},${yStr}`);
+                }
+                return this.coordsToVillageId.get(`${x},${y}`);
+            }
+
+            villageIdToCoordinates(villageId) {
+                const village = this.villageData.get(villageId);
+                return village ? { x: village.x, y: village.y } : null;
+            }
+
+            // Check if data is loaded
+            isDataLoaded() {
+                return this.villageData.size > 0;
+            }
+
+            // Get data stats
+            getStats() {
+                return {
+                    world: this.world,
+                    villageCount: this.villageData.size,
+                    playerCount: this.playerVillages.size,
+                    lastUpdated: this.lastUpdated,
+                    cacheAge: this.lastUpdated ? Math.round((Date.now() - this.lastUpdated.getTime()) / (1000 * 60 * 60)) : null
+                };
+            }
+
+            // Add village manually (for backwards compatibility)
+            addVillage(coords, name, player) {
+                const [x, y] = coords.split('|').map(Number);
+                const villageId = this.coordinatesToVillageId(x, y);
+                
+                if (villageId) {
+                    // Village exists in data, update if needed
+                    const existing = this.villageData.get(villageId);
+                    if (existing) {
+                        existing.name = name;
+                        existing.player = player;
+                    }
+                } else {
+                    // Create temporary village for backwards compatibility
+                    const tempId = x * 1000 + y;
+                    const villageInfo = {
+                        id: tempId,
+                        name: name,
+                        x: x,
+                        y: y,
+                        playerId: 0,
+                        points: 0,
+                        player: player
+                    };
+                    
+                    this.villageData.set(tempId, villageInfo);
+                    this.coordsToVillageId.set(`${x},${y}`, tempId);
+                    this.villageNameToId.set(name, tempId);
+                }
+            }
+        }
+
+        const villageDataManager = new VillageDataManager();
+
+        // DS Workbench helper functions
+        function base64Encode(value) {
+            if (!value) return '';
+            return btoa(String(value));
+        }
+
+        function base64Decode(value) {
+            if (!value) return '';
+            try {
+                return atob(value);
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function parseTroopsString(troopsStr) {
+            const troops = {};
+            
+            // Remove militia=MA== from the end
+            const baseStr = troopsStr.split('militia=MA==')[0];
+            
+            // Split into unit assignments and parse
+            const unitPairs = baseStr.split('/');
+            for (const pair of unitPairs) {
+                if (pair.includes('=')) {
+                    const [unit, value] = pair.split('=', 2);
+                    // Decode base64 values
+                    troops[unit] = base64Decode(value) || '';
+                }
+            }
+            
+            return troops;
+        }
+
+        function assembleTroopsString(troops) {
+            const pairs = [];
+            
+            // Add all unit assignments
+            for (const [unit, value] of Object.entries(troops)) {
+                if (value !== undefined && value !== '') {
+                    pairs.push(`${unit}=${base64Encode(value)}`);
+                }
+            }
+            
+            // Add militia=MA== at the end
+            pairs.push('militia=MA==');
+            
+            return pairs.join('/');
+        }
+
+        function calculateTravelTimeMs(sourceX, sourceY, targetX, targetY, unitType) {
+            const distance = calculateDistance(`${sourceX}|${sourceY}`, `${targetX}|${targetY}`);
+            const unitSpeed = UNIT_SPEEDS[unitType] || 18;
+            const travelTimeMinutes = distance * unitSpeed;
+            return travelTimeMinutes * 60 * 1000; // Convert to milliseconds
+        }
+
+        function formatDateTimeDS(date) {
+            // Format date in Europe/Berlin timezone
+            const options = {
+                timeZone: 'Europe/Berlin',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+
+            // Get date parts in Berlin timezone
+            const formatter = new Intl.DateTimeFormat('en-GB', options);
+            const parts = formatter.formatToParts(date);
+
+            const day = parts.find(p => p.type === 'day').value;
+            const month = parts.find(p => p.type === 'month').value;
+            const year = parts.find(p => p.type === 'year').value;
+            const hours = parts.find(p => p.type === 'hour').value;
+            const minutes = parts.find(p => p.type === 'minute').value;
+            const seconds = parts.find(p => p.type === 'second').value;
+            const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+
+            return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}:${milliseconds}`;
+        }
+
+        let planData = [];
+        let troopData = [];
+        let currentInputFormat = 'bb'; // 'bb' or 'dsw'
+        let currentTroopFormat = 'standard'; // 'standard' or 'tribe'
+
+        function parseDateTime(dateTimeStr) {
+            // Parse format: 2025-07-07 07:47:21:0
+            // Times are assumed to be in Europe/Berlin timezone
+            const match = dateTimeStr.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}):(\d+)/);
+            if (!match) return null;
+
+            const [, year, month, day, hour, minute, second] = match;
+            // Create date string in ISO format for Europe/Berlin timezone
+            const dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${second.padStart(2, '0')}`;
+
+            // Parse as Europe/Berlin timezone
+            const date = new Date(dateStr);
+            // Calculate timezone offset for Europe/Berlin
+            const berlinDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+            const localDate = new Date(date.toLocaleString('en-US'));
+            const offset = localDate.getTime() - berlinDate.getTime();
+
+            // Return date adjusted to represent Berlin time in UTC
+            return new Date(date.getTime() - offset);
+        }
+
+        function formatDateTime(date) {
+            // Format date in Europe/Berlin timezone
+            const options = {
+                timeZone: 'Europe/Berlin',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+
+            const parts = new Intl.DateTimeFormat('sv-SE', options).format(date);
+            // Convert from "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DD HH:MM:SS:0"
+            return parts.replace(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/, '$1-$2-$3 $4:$5:$6:0');
+        }
+
+        function calculateDistance(coord1, coord2) {
+            const [x1, y1] = coord1.split('|').map(Number);
+            const [x2, y2] = coord2.split('|').map(Number);
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        function calculateTravelTime(distance, unitType) {
+            return Math.ceil(distance * UNIT_SPEEDS[unitType]);
+        }
+
+        function parsePlan(planText) {
+            if (currentInputFormat === 'dsw') {
+                return parseDSWPlan(planText);
+            } else {
+                return parseBBPlan(planText);
+            }
+        }
+
+        function parseBBPlan(planText) {
+            const attacks = [];
+            const lines = planText.split('\n');
+            
+            for (const line of lines) {
+                if (line.includes('Roter Punkt')) {
+                    const sourcePlayerMatch = line.match(/von \[b\]([^[]+)\[\/b\]/);
+                    const sourceMatch = line.match(/aus \[coord\](\d+\|\d+)\[\/coord\]/);
+                    const targetPlayerMatch = line.match(/auf \[b\]([^[]+)\[\/b\]/);
+                    const targetMatch = line.match(/in \[coord\](\d+\|\d+)\[\/coord\]/);
+                    const startTimeMatch = line.match(/startet am \[color=#ff0e0e\]([^[]+)\[\/color\]/);
+                    const arrivalTimeMatch = line.match(/kommt am \[color=#2eb92e\]([^[]+)\[\/color\]/);
+                    
+                    if (sourceMatch && targetMatch && startTimeMatch && arrivalTimeMatch) {
+                        const sourcePlayer = sourcePlayerMatch ? sourcePlayerMatch[1] : 'Unknown';
+                        const targetPlayer = targetPlayerMatch ? targetPlayerMatch[1] : 'Unknown';
+                        
+                        // Add villages to manager for backwards compatibility
+                        villageDataManager.addVillage(sourceMatch[1], sourceMatch[1], sourcePlayer);
+                        villageDataManager.addVillage(targetMatch[1], targetMatch[1], targetPlayer);
+                        
+                        attacks.push({
+                            sourcePlayer: sourcePlayer,
+                            source: sourceMatch[1],
+                            targetPlayer: targetPlayer,
+                            target: targetMatch[1],
+                            startTime: parseDateTime(startTimeMatch[1]),
+                            arrivalTime: parseDateTime(arrivalTimeMatch[1]),
+                            unit: 'snob'
+                        });
+                    }
+                }
+            }
+            
+            return attacks;
+        }
+
+        function parseDSWPlan(planText) {
+            const attacks = [];
+            const lines = planText.split('\n');
+            
+            for (const line of lines) {
+                if (line.trim()) {
+                    const command = parseDSWCommand(line);
+                    if (command && command.unitType === 'snob') {
+                        attacks.push({
+                            sourcePlayer: command.sourceVillage ? command.sourceVillage.player : 'Unknown',
+                            source: `${command.sourceCoords.x}|${command.sourceCoords.y}`,
+                            targetPlayer: command.targetVillage ? command.targetVillage.player : 'Unknown',
+                            target: `${command.targetCoords.x}|${command.targetCoords.y}`,
+                            startTime: command.send.datetime,
+                            arrivalTime: command.arrival.datetime,
+                            unit: 'snob'
+                        });
+                    }
+                }
+            }
+            
+            return attacks;
+        }
+
+        function parseDSWCommand(line) {
+            try {
+                const parts = line.trim().split('&');
+                if (parts.length !== 8) {
+                    return null;
+                }
+
+                const sourceVillageId = parseInt(parts[0]);
+                const targetVillageId = parseInt(parts[1]);
+                const unitType = parts[2];
+                const arrivalTimestamp = parseInt(parts[3]);
+                const arrivalTime = new Date(arrivalTimestamp);
+                const attackType = parts[4];
+                const attackName = ATTACK_TYPES[attackType] || "unknown";
+                const unusedFlag = parts[5].toLowerCase() === 'true';
+                const sentFlag = parts[6].toLowerCase() === 'true';
+                const troops = parseTroopsString(parts[7]);
+
+                // Try to get coordinates from village manager
+                let sourceCoords = villageDataManager.villageIdToCoordinates(sourceVillageId);
+                let targetCoords = villageDataManager.villageIdToCoordinates(targetVillageId);
+                
+                if (!sourceCoords) {
+                    // Generate coordinates from ID (fallback)
+                    sourceCoords = { x: Math.floor(sourceVillageId / 1000), y: sourceVillageId % 1000 };
+                }
+                if (!targetCoords) {
+                    targetCoords = { x: Math.floor(targetVillageId / 1000), y: targetVillageId % 1000 };
+                }
+
+                const sourceVillage = villageDataManager.getVillageById(sourceVillageId);
+                const targetVillage = villageDataManager.getVillageById(targetVillageId);
+                
+                // Calculate travel time
+                const travelTimeMs = calculateTravelTimeMs(
+                    sourceCoords.x, sourceCoords.y, 
+                    targetCoords.x, targetCoords.y, 
+                    unitType
+                );
+                const sendTime = new Date(arrivalTime.getTime() - travelTimeMs);
+
+                return {
+                    sourceVillageId,
+                    targetVillageId,
+                    sourceCoords,
+                    targetCoords,
+                    sourceVillage,
+                    targetVillage,
+                    unitType,
+                    arrival: {
+                        timestamp: arrivalTimestamp,
+                        datetime: arrivalTime,
+                        formatted: formatDateTimeDS(arrivalTime)
+                    },
+                    send: {
+                        datetime: sendTime,
+                        formatted: formatDateTimeDS(sendTime)
+                    },
+                    attackType,
+                    attackName,
+                    flags: {
+                        unused: unusedFlag,
+                        sent: sentFlag
+                    },
+                    troops
+                };
+            } catch (error) {
+                console.error(`Error parsing DSW line: ${line}`, error);
+                return null;
+            }
+        }
+
+        // Load village data function
+        async function loadVillageData() {
+            const worldInput = document.getElementById('worldInput').value.trim();
+            const statusInfo = document.getElementById('villageDataInfo');
+            
+            if (!worldInput) {
+                showError('Bitte geben Sie eine Welt ein (z.B. de230)');
+                return;
+            }
+
+            try {
+                statusInfo.textContent = 'Lade Dorfdata...';
+                statusInfo.style.color = '#fbbf24';
+                
+                const success = await villageDataManager.loadVillageData(worldInput);
+                
+                if (success) {
+                    const stats = villageDataManager.getStats();
+                    statusInfo.innerHTML = `
+                        <strong>Dorfdata erfolgreich geladen!</strong><br>
+                        <strong>Welt:</strong> ${stats.world}<br>
+                        <strong>Dörfer:</strong> ${stats.villageCount.toLocaleString()}<br>
+                        <strong>Spieler:</strong> ${stats.playerCount.toLocaleString()}<br>
+                        <strong>Geladen:</strong> ${stats.lastUpdated.toLocaleString()}<br>
+                        <strong>Cache-Alter:</strong> ${stats.cacheAge}h
+                    `;
+                    statusInfo.style.color = '#86efac';
+                    showSuccess(`Dorfdata für ${stats.world} geladen: ${stats.villageCount.toLocaleString()} Dörfer`);
+                } else {
+                    throw new Error('Unbekannter Fehler beim Laden der Dorfdata');
+                }
+            } catch (error) {
+                console.error('Error loading village data:', error);
+                
+                let errorMessage = error.message;
+                let suggestion = '';
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+                    errorMessage = 'CORS-Fehler: Direkter Zugriff auf den Spielserver blockiert';
+                    suggestion = '<br><br><strong>Lösung:</strong> Verwenden Sie die manuelle Eingabe-Option oder einen Browser mit deaktivierter CORS-Prüfung.';
+                } else if (error.message.includes('HTTP')) {
+                    suggestion = '<br><br><strong>Tipp:</strong> Überprüfen Sie die Weltangabe und versuchen Sie es erneut.';
+                }
+                
+                statusInfo.innerHTML = `
+                    <strong>❌ Fehler beim Laden der Dorfdata:</strong><br>
+                    ${errorMessage}${suggestion}<br><br>
+                    <button onclick="showManualInput()" style="padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        📝 Manuelle Eingabe verwenden
+                    </button>
+                `;
+                statusInfo.style.color = '#fca5a5';
+                showError(`Fehler beim Laden der Dorfdata: ${errorMessage}`);
+            }
+        }
+
+        // Manual input functions
+        function showManualInput() {
+            const modal = document.getElementById('manualInputModal');
+            modal.style.display = 'flex';
+            
+            const worldInput = document.getElementById('worldInput').value.trim() || 'de230';
+            const instructions = document.getElementById('manualInstructions');
+            instructions.innerHTML = `
+                <strong>Anleitung:</strong><br>
+                1. Öffnen Sie <strong><a href="https://${worldInput}.die-staemme.de/map/village.txt" target="_blank" style="color: #f59e0b;">https://${worldInput}.die-staemme.de/map/village.txt</a></strong> in einem neuen Tab<br>
+                2. Kopieren Sie den kompletten Inhalt (Strg+A, dann Strg+C)<br>
+                3. Fügen Sie ihn in das Textfeld unten ein<br>
+                4. Klicken Sie auf "Daten laden"<br><br>
+                <small style="color: #94a3b8;">💡 Das CSV-Format sollte etwa so aussehen: "12345,Dorfname,500,600,789,8543,0"</small>
+            `;
+        }
+
+        function hideManualInput() {
+            document.getElementById('manualInputModal').style.display = 'none';
+            document.getElementById('manualVillageData').value = '';
+        }
+
+        function loadManualVillageData() {
+            const worldInput = document.getElementById('worldInput').value.trim();
+            const csvData = document.getElementById('manualVillageData').value.trim();
+            const statusInfo = document.getElementById('villageDataInfo');
+            
+            if (!worldInput) {
+                showError('Bitte geben Sie eine Welt ein');
+                return;
+            }
+            
+            if (!csvData) {
+                showError('Bitte fügen Sie die CSV-Daten ein');
+                return;
+            }
+
+            try {
+                statusInfo.textContent = 'Verarbeite manuelle Dorfdata...';
+                statusInfo.style.color = '#fbbf24';
+                
+                const success = villageDataManager.loadVillageDataFromText(csvData, worldInput);
+                
+                if (success) {
+                    const stats = villageDataManager.getStats();
+                    statusInfo.innerHTML = `
+                        <strong>Dorfdata erfolgreich geladen! (Manuell)</strong><br>
+                        <strong>Welt:</strong> ${stats.world}<br>
+                        <strong>Dörfer:</strong> ${stats.villageCount.toLocaleString()}<br>
+                        <strong>Spieler:</strong> ${stats.playerCount.toLocaleString()}<br>
+                        <strong>Geladen:</strong> ${stats.lastUpdated.toLocaleString()}
+                    `;
+                    statusInfo.style.color = '#86efac';
+                    showSuccess(`Dorfdata für ${stats.world} manuell geladen: ${stats.villageCount.toLocaleString()} Dörfer`);
+                    hideManualInput();
+                } else {
+                    throw new Error('Fehler beim Verarbeiten der CSV-Daten');
+                }
+            } catch (error) {
+                console.error('Error loading manual village data:', error);
+                statusInfo.innerHTML = `
+                    <strong>❌ Fehler beim Verarbeiten der manuellen Daten:</strong><br>
+                    ${error.message}<br>
+                    <small>Überprüfen Sie das CSV-Format und versuchen Sie es erneut.</small>
+                `;
+                statusInfo.style.color = '#fca5a5';
+                showError(`Fehler beim Verarbeiten der manuellen Daten: ${error.message}`);
+            }
+        }
+
+        // Update village data status on page load
+        function updateVillageDataStatus() {
+            const statusInfo = document.getElementById('villageDataInfo');
+            
+            if (villageDataManager.isDataLoaded()) {
+                const stats = villageDataManager.getStats();
+                statusInfo.innerHTML = `
+                    <strong>✅ Dorfdata verfügbar (aus Cache)</strong><br>
+                    <strong>Welt:</strong> ${stats.world}<br>
+                    <strong>Dörfer:</strong> ${stats.villageCount.toLocaleString()}<br>
+                    <strong>Spieler:</strong> ${stats.playerCount.toLocaleString()}<br>
+                    <strong>Geladen:</strong> ${stats.lastUpdated.toLocaleString()}<br>
+                    <strong>Cache-Alter:</strong> ${stats.cacheAge}h
+                `;
+                statusInfo.style.color = '#86efac';
+                document.getElementById('worldInput').value = stats.world;
+            } else {
+                statusInfo.innerHTML = `
+                    <strong>ℹ️ Keine Dorfdata geladen</strong><br>
+                    Klicken Sie auf "Dorfdata laden" um die aktuellen Dorfkoordinaten zu laden.<br>
+                    Bei CORS-Fehlern verwenden Sie die manuelle Eingabe-Option.<br><br>
+                    <button onclick="showManualInput()" style="padding: 6px 12px; font-size: 11px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        📝 Manuelle Eingabe
+                    </button>
+                `;
+                statusInfo.style.color = '#cbd5e1';
+            }
+        }
+
+        function parseTroops(troopsText) {
+            if (currentTroopFormat === 'tribe') {
+                return parseTribeTroops(troopsText);
+            } else {
+                return parseStandardTroops(troopsText);
+            }
+        }
+
+        function parseStandardTroops(troopsText) {
+            const troops = [];
+            const lines = troopsText.split('\n');
+
+            for (const line of lines) {
+                if (line.includes('eigene') && line.includes('Befehle')) {
+                    const parts = line.split('\t');
+                    if (parts.length >= 11) {
+                        const villageName = parts[0].trim();
+                        const coordMatch = villageName.match(/\((\d+\|\d+)\)/);
+
+                        if (coordMatch) {
+                            const coords = coordMatch[1];
+                            const spears = parseInt(parts[2]) || 0;      // Speerkämpfer
+                            const swords = parseInt(parts[3]) || 0;      // Schwertkämpfer
+                            const axes = parseInt(parts[4]) || 0;        // Axtkämpfer (not used)
+                            const spies = parseInt(parts[5]) || 0;       // Späher
+                            const light = parseInt(parts[6]) || 0;       // Leichte-Kavallerie
+                            const heavy = parseInt(parts[7]) || 0;       // Schwere-Kavallerie
+                            const rams = parseInt(parts[8]) || 0;        // Rammbock
+                            const catapults = parseInt(parts[9]) || 0;   // Katapult
+                            const nobles = parseInt(parts[10]) || 0;     // Adelsgeschlecht
+
+                            troops.push({
+                                name: villageName,
+                                coords: coords,
+                                spears: spears,
+                                swords: swords,
+                                heavy: heavy,
+                                spies: spies,
+                                light: light,
+                                rams: rams,
+                                catapults: catapults,
+                                nobles: nobles
+                            });
+                        }
+                    }
+                }
+            }
+
+            return troops;
+        }
+
+        function parseTribeTroops(troopsText) {
+            const troops = [];
+            const lines = troopsText.split('\n');
+
+            for (const line of lines) {
+                // Skip empty lines and header
+                if (!line.trim() || line.includes('Coords,Player,spear')) {
+                    continue;
+                }
+
+                // Parse CSV format: Coords,Player,spear,sword,axe,spy,light,heavy,ram,catapult,knight,snob
+                const parts = line.split(',');
+                if (parts.length >= 12) {
+                    const coords = parts[0].trim();
+                    const player = decodeURIComponent(parts[1].trim());
+
+                    // Skip entries with unknown troop counts (marked with ?)
+                    if (parts[2].includes('?')) {
+                        continue;
+                    }
+
+                    const spears = parseInt(parts[2]) || 0;
+                    const swords = parseInt(parts[3]) || 0;
+                    const axes = parseInt(parts[4]) || 0;        // Not used in support
+                    const spies = parseInt(parts[5]) || 0;
+                    const light = parseInt(parts[6]) || 0;
+                    const heavy = parseInt(parts[7]) || 0;
+                    const rams = parseInt(parts[8]) || 0;
+                    const catapults = parseInt(parts[9]) || 0;
+                    const knights = parseInt(parts[10]) || 0;
+                    const nobles = parseInt(parts[11]) || 0;
+
+                    troops.push({
+                        name: `${player} (${coords})`,
+                        coords: coords,
+                        spears: spears,
+                        swords: swords,
+                        heavy: heavy,
+                        spies: spies,
+                        light: light,
+                        rams: rams,
+                        catapults: catapults,
+                        nobles: nobles
+                    });
+                }
+            }
+
+            return troops;
+        }
+
+        function findFakeSupports(attack, availableTroops, usedVillages, numFakeSupports, fakeUnitTypes, config) {
+            const fakeSupports = [];
+            const maxDistance = config.maxDistance;
+            const requiredArrivalTime = attack.arrivalTime;
+
+            // If no unit types selected, return empty array
+            if (!fakeUnitTypes || fakeUnitTypes.length === 0) {
+                return fakeSupports;
+            }
+
+            // Find villages that haven't been used and are within range
+            const availableVillages = availableTroops.filter(village => {
+                const distance = calculateDistance(village.coords, attack.target);
+                const isUsed = usedVillages.has(village.coords);
+
+                // Check if village has at least 1 unit of any of the specified types
+                let hasUnit = false;
+                for (const unitType of fakeUnitTypes) {
+                    switch(unitType) {
+                        case 'spear': if (village.spears > 0) hasUnit = true; break;
+                        case 'sword': if (village.swords > 0) hasUnit = true; break;
+                        case 'axe': if (village.axes > 0) hasUnit = true; break;
+                        case 'spy': if (village.spies > 0) hasUnit = true; break;
+                        case 'light': if (village.light > 0) hasUnit = true; break;
+                        case 'heavy': if (village.heavy > 0) hasUnit = true; break;
+                    }
+                    if (hasUnit) break;
+                }
+
+                return !isUsed && distance <= maxDistance && hasUnit;
+            });
+
+            // Sort by distance (closest first for fake supports)
+            availableVillages.sort((a, b) => {
+                const distA = calculateDistance(a.coords, attack.target);
+                const distB = calculateDistance(b.coords, attack.target);
+                return distA - distB;
+            });
+
+            // Generate fake supports, cycling through unit types
+            let unitTypeIndex = 0;
+            for (let i = 0; i < Math.min(numFakeSupports, availableVillages.length); i++) {
+                const village = availableVillages[i];
+                const distance = calculateDistance(village.coords, attack.target);
+
+                // Select unit type for this fake, cycling through available types
+                let selectedUnitType = null;
+                let attempts = 0;
+
+                // Try to find a unit type that this village has
+                while (attempts < fakeUnitTypes.length) {
+                    const unitType = fakeUnitTypes[unitTypeIndex % fakeUnitTypes.length];
+                    unitTypeIndex++;
+                    attempts++;
+
+                    // Check if village has this unit type
+                    let hasThisUnit = false;
+                    switch(unitType) {
+                        case 'spear': hasThisUnit = village.spears > 0; break;
+                        case 'sword': hasThisUnit = village.swords > 0; break;
+                        case 'axe': hasThisUnit = village.axes > 0; break;
+                        case 'spy': hasThisUnit = village.spies > 0; break;
+                        case 'light': hasThisUnit = village.light > 0; break;
+                        case 'heavy': hasThisUnit = village.heavy > 0; break;
+                    }
+
+                    if (hasThisUnit) {
+                        selectedUnitType = unitType;
+                        break;
+                    }
+                }
+
+                // If no suitable unit type found, skip this village
+                if (!selectedUnitType) continue;
+
+                const travelTime = calculateTravelTime(distance, selectedUnitType);
+                const sendTime = new Date(requiredArrivalTime.getTime() - travelTime * 60000);
+
+                // Only add if send time is after nobleman start time and respects max time difference
+                if (sendTime > attack.startTime) {
+                    const timeDiffMinutes = (sendTime.getTime() - attack.startTime.getTime()) / 60000;
+                    if (timeDiffMinutes <= config.maxTimeDiff) {
+                        // Create troop counts object
+                        const troops = {
+                            spears: 0,
+                            swords: 0,
+                            axes: 0,
+                            spies: 0,
+                            light: 0,
+                            heavy: 0,
+                            rams: 0,
+                            catapults: 0
+                        };
+
+                        // Set the fake unit count to 1
+                        switch(selectedUnitType) {
+                            case 'spear': troops.spears = 1; break;
+                            case 'sword': troops.swords = 1; break;
+                            case 'axe': troops.axes = 1; break;
+                            case 'spy': troops.spies = 1; break;
+                            case 'light': troops.light = 1; break;
+                            case 'heavy': troops.heavy = 1; break;
+                        }
+
+                        fakeSupports.push({
+                            village: village.name,
+                            coords: village.coords,
+                            target: attack.target,
+                            spears: troops.spears,
+                            swords: troops.swords,
+                            axes: troops.axes,
+                            spies: troops.spies,
+                            light: troops.light,
+                            heavy: troops.heavy,
+                            rams: troops.rams,
+                            catapults: troops.catapults,
+                            sendTime: sendTime,
+                            arrivalTime: requiredArrivalTime,
+                            distance: distance,
+                            travelTime: travelTime,
+                            slowestUnit: selectedUnitType,
+                            timeDiffFromNobleman: sendTime.getTime() - attack.startTime.getTime(),
+                            isFake: true
+                        });
+
+                        usedVillages.add(village.coords);
+                    }
+                }
+            }
+
+            return fakeSupports;
+        }
+
+        function findOptimalSupport(attack, availableTroops, config) {
+            const supportPlans = [];
+            const maxDistance = config.maxDistance;
+            
+            // Support must arrive at the same time as nobleman
+            const requiredArrivalTime = attack.arrivalTime;
+            
+            // Find suitable villages within range
+            const suitableVillages = availableTroops.filter(village => {
+                const distance = calculateDistance(village.coords, attack.target);
+                return distance <= maxDistance && (village.spears > 0 || village.swords > 0 || village.heavy > 0 || village.rams > 0 || village.catapults > 0);
+            });
+            
+            // Calculate potential support plans
+            const potentialSupports = [];
+            
+            for (const village of suitableVillages) {
+                const distance = calculateDistance(village.coords, attack.target);
+                const spearsToSend = Math.min(config.totalSpears, village.spears);
+                const swordsToSend = Math.min(config.totalSwords, village.swords);
+                const heavyToSend = Math.min(config.totalHeavy, village.heavy);
+                
+                if (spearsToSend > 0 || swordsToSend > 0 || heavyToSend > 0) {
+                    // Find the actual slowest unit by comparing speeds of units we're actually sending
+                    let slowestUnit = null;
+                    let slowestSpeed = 0;
+                    
+                    if (spearsToSend > 0) {
+                        if (!slowestUnit || UNIT_SPEEDS.spear > slowestSpeed) {
+                            slowestUnit = 'spear';
+                            slowestSpeed = UNIT_SPEEDS.spear;
+                        }
+                    }
+                    if (swordsToSend > 0) {
+                        if (!slowestUnit || UNIT_SPEEDS.sword > slowestSpeed) {
+                            slowestUnit = 'sword';
+                            slowestSpeed = UNIT_SPEEDS.sword;
+                        }
+                    }
+                    if (heavyToSend > 0) {
+                        if (!slowestUnit || UNIT_SPEEDS.heavy > slowestSpeed) {
+                            slowestUnit = 'heavy';
+                            slowestSpeed = UNIT_SPEEDS.heavy;
+                        }
+                    }
+                    
+                    const travelTimeNormal = calculateTravelTime(distance, slowestUnit);
+                    const sendTimeNormal = new Date(requiredArrivalTime.getTime() - travelTimeNormal * 60000);
+                    
+                    // Check if adding ram/catapult would improve timing
+                    let bestOption = {
+                        spears: spearsToSend,
+                        swords: swordsToSend,
+                        heavy: heavyToSend,
+                        rams: 0,
+                        catapults: 0,
+                        sendTime: sendTimeNormal,
+                        travelTime: travelTimeNormal,
+                        slowestUnit: slowestUnit
+                    };
+                    
+                    // Only consider ram/catapult if send time is after nobleman and we have them
+                    if (sendTimeNormal > attack.startTime) {
+                        const timeDiffNormal = sendTimeNormal.getTime() - attack.startTime.getTime();
+                        
+                        // Try adding a ram if available
+                        if (village.rams > 0) {
+                            const travelTimeWithRam = calculateTravelTime(distance, 'ram');
+                            const sendTimeWithRam = new Date(requiredArrivalTime.getTime() - travelTimeWithRam * 60000);
+                            
+                            if (sendTimeWithRam > attack.startTime) {
+                                const timeDiffWithRam = sendTimeWithRam.getTime() - attack.startTime.getTime();
+                                
+                                // If ram gives better timing (smaller time difference), use it
+                                if (timeDiffWithRam < timeDiffNormal) {
+                                    bestOption = {
+                                        spears: spearsToSend,
+                                        swords: swordsToSend,
+                                        heavy: heavyToSend,
+                                        rams: 1,
+                                        catapults: 0,
+                                        sendTime: sendTimeWithRam,
+                                        travelTime: travelTimeWithRam,
+                                        slowestUnit: 'ram'
+                                    };
+                                }
+                            }
+                        }
+                        
+                        // Try adding a catapult if available and no ram was better
+                        if (village.catapults > 0 && bestOption.rams === 0) {
+                            const travelTimeWithCatapult = calculateTravelTime(distance, 'catapult');
+                            const sendTimeWithCatapult = new Date(requiredArrivalTime.getTime() - travelTimeWithCatapult * 60000);
+                            
+                            if (sendTimeWithCatapult > attack.startTime) {
+                                const timeDiffWithCatapult = sendTimeWithCatapult.getTime() - attack.startTime.getTime();
+                                const currentBestTimeDiff = bestOption.sendTime.getTime() - attack.startTime.getTime();
+                                
+                                // If catapult gives better timing, use it
+                                if (timeDiffWithCatapult < currentBestTimeDiff) {
+                                    bestOption = {
+                                        spears: spearsToSend,
+                                        swords: swordsToSend,
+                                        heavy: heavyToSend,
+                                        rams: 0,
+                                        catapults: 1,
+                                        sendTime: sendTimeWithCatapult,
+                                        travelTime: travelTimeWithCatapult,
+                                        slowestUnit: 'catapult'
+                                    };
+                                }
+                            }
+                        }
+                        
+                        // Only add if the best option has a valid send time and respects max time difference
+                        const timeDiffMinutes = (bestOption.sendTime.getTime() - attack.startTime.getTime()) / 60000;
+                        if (bestOption.sendTime > attack.startTime && timeDiffMinutes <= config.maxTimeDiff) {
+                            potentialSupports.push({
+                                village: village.name,
+                                coords: village.coords,
+                                target: attack.target,
+                                spears: bestOption.spears,
+                                swords: bestOption.swords,
+                                heavy: bestOption.heavy,
+                                rams: bestOption.rams,
+                                catapults: bestOption.catapults,
+                                sendTime: bestOption.sendTime,
+                                arrivalTime: requiredArrivalTime,
+                                distance: distance,
+                                travelTime: bestOption.travelTime,
+                                slowestUnit: bestOption.slowestUnit,
+                                timeDiffFromNobleman: bestOption.sendTime.getTime() - attack.startTime.getTime()
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // Sort by distance (furthest first) to minimize time difference from nobleman
+            // Furthest villages need to be sent earliest, minimizing "nach Adel-Start"
+            potentialSupports.sort((a, b) => b.distance - a.distance);
+            
+            // Distribute troops optimally
+            let remainingSpears = config.totalSpears;
+            let remainingSwords = config.totalSwords;
+            let remainingHeavy = config.totalHeavy;
+            
+            for (const support of potentialSupports) {
+                if (remainingSpears <= 0 && remainingSwords <= 0 && remainingHeavy <= 0) {
+                    break;
+                }
+                
+                const spearsToSend = Math.min(remainingSpears, support.spears);
+                const swordsToSend = Math.min(remainingSwords, support.swords);
+                const heavyToSend = Math.min(remainingHeavy, support.heavy);
+                
+                if (spearsToSend > 0 || swordsToSend > 0 || heavyToSend > 0) {
+                    supportPlans.push({
+                        village: support.village,
+                        coords: support.coords,
+                        target: support.target,
+                        spears: spearsToSend,
+                        swords: swordsToSend,
+                        heavy: heavyToSend,
+                        rams: support.rams,
+                        catapults: support.catapults,
+                        sendTime: support.sendTime,
+                        arrivalTime: support.arrivalTime,
+                        distance: support.distance,
+                        travelTime: support.travelTime,
+                        slowestUnit: support.slowestUnit,
+                        timeDiffFromNobleman: support.timeDiffFromNobleman
+                    });
+                    
+                    remainingSpears -= spearsToSend;
+                    remainingSwords -= swordsToSend;
+                    remainingHeavy -= heavyToSend;
+                }
+            }
+            
+            return supportPlans;
+        }
+
+        // Helper function to get selected fake unit types
+        function getSelectedFakeUnitTypes() {
+            const checkboxes = document.querySelectorAll('.fakeUnitCheckbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function calculateSupport() {
+            const planText = document.getElementById('planInput').value;
+            const troopsText = document.getElementById('troopsInput').value;
+            
+            if (!planText || !troopsText) {
+                showError('Bitte füllen Sie beide Eingabefelder aus.');
+                return;
+            }
+            
+            try {
+                planData = parsePlan(planText);
+                troopData = parseTroops(troopsText);
+                
+                if (planData.length === 0) {
+                    showError('Keine Adelsangriffe im Plan gefunden.');
+                    return;
+                }
+                
+                if (troopData.length === 0) {
+                    showError('Keine Truppen-Daten gefunden.');
+                    return;
+                }
+                
+                const config = {
+                    totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
+                    totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
+                    totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    maxDistance: parseInt(document.getElementById('maxDistance').value) || 30,
+                    maxTimeDiff: parseInt(document.getElementById('maxTimeDiff').value) || 999999,
+                    fakeSupports: parseInt(document.getElementById('fakeSupports').value) || 0,
+                    fakeUnitTypes: getSelectedFakeUnitTypes()
+                };
+
+                let allSupportPlans = [];
+                let allFakeSupports = [];
+                let totalSupports = 0;
+                let totalFakes = 0;
+
+                let resultHtml = `<h2>Support-Berechnungen</h2>`;
+
+                for (const attack of planData) {
+                    const supportPlans = findOptimalSupport(attack, troopData, config);
+                    allSupportPlans = allSupportPlans.concat(supportPlans);
+                    totalSupports += supportPlans.length;
+
+                    // Generate fake supports if requested
+                    let fakeSupports = [];
+                    if (config.fakeSupports > 0) {
+                        const usedVillages = new Set(supportPlans.map(s => s.coords));
+                        fakeSupports = findFakeSupports(attack, troopData, usedVillages, config.fakeSupports, config.fakeUnitTypes, config);
+                        allFakeSupports = allFakeSupports.concat(fakeSupports);
+                        totalFakes += fakeSupports.length;
+                    }
+                    
+                    resultHtml += `
+                        <div class="attack-plan">
+                            <div class="attack-header">
+                                Adelsangriff: ${attack.sourcePlayer} (${attack.source}) → ${attack.targetPlayer} (${attack.target})
+                            </div>
+                            <div class="attack-details">
+                                <strong>Angreifer:</strong> ${attack.sourcePlayer} von ${attack.source}<br>
+                                <strong>Ziel:</strong> ${attack.targetPlayer} in ${attack.target}<br>
+                                <strong>Adel startet:</strong> ${formatDateTime(attack.startTime)}<br>
+                                <strong>Adel kommt an:</strong> ${formatDateTime(attack.arrivalTime)}
+                            </div>
+                            <div class="support-list">
+                                <h4>Support-Truppen (${supportPlans.length} Dörfer) - Ankunft gleichzeitig mit Adel:</h4>
+                    `;
+                    
+                    if (supportPlans.length === 0) {
+                        resultHtml += '<div class="support-item">Keine geeigneten Support-Dörfer gefunden.</div>';
+                    } else {
+                        for (const support of supportPlans) {
+                            const timeDiffFromNobleman = Math.round(support.timeDiffFromNobleman / 60000);
+                            const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' : 
+                                              support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
+                            
+                            resultHtml += `
+                                <div class="support-item">
+                                    <strong>${support.village}</strong> (${support.coords})<br>
+                                    Truppen: ${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavalerie${timingInfo}<br>
+                                    <strong>Senden:</strong> ${formatDateTime(support.sendTime)} (+${timeDiffFromNobleman} min nach Adel-Start)<br>
+                                    <strong>Ankunft:</strong> ${formatDateTime(support.arrivalTime)} (gleichzeitig mit Adel)
+                                    <div class="timing-info">
+                                        Entfernung: ${support.distance.toFixed(1)} Felder | Reisezeit: ${support.travelTime} min | Langsamste Einheit: ${support.slowestUnit}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Close the regular support-list div
+                    resultHtml += `
+                        </div>
+                    `;
+
+                    // Display fake supports if any were generated
+                    if (fakeSupports.length > 0) {
+                        resultHtml += `
+                            <div class="support-list" style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; margin-top: 20px;">
+                                <h4 style="color: #fca5a5;">Fake-Support-Truppen (${fakeSupports.length} Dörfer):</h4>
+                        `;
+
+                        for (const fakeSupport of fakeSupports) {
+                            const timeDiffFromNobleman = Math.round(fakeSupport.timeDiffFromNobleman / 60000);
+                            const unitName = fakeSupport.slowestUnit === 'spear' ? 'Speerkämpfer' :
+                                           fakeSupport.slowestUnit === 'sword' ? 'Schwertkämpfer' :
+                                           fakeSupport.slowestUnit === 'axe' ? 'Axtkämpfer' :
+                                           fakeSupport.slowestUnit === 'spy' ? 'Späher' :
+                                           fakeSupport.slowestUnit === 'light' ? 'Leichte Kavallerie' :
+                                           fakeSupport.slowestUnit === 'heavy' ? 'Schwere Kavallerie' :
+                                           fakeSupport.slowestUnit;
+
+                            resultHtml += `
+                                <div class="support-item" style="border-color: rgba(239, 68, 68, 0.3);">
+                                    <strong>${fakeSupport.village}</strong> (${fakeSupport.coords})<br>
+                                    <span style="color: #fca5a5;">FAKE:</span> 1x ${unitName}<br>
+                                    <strong>Senden:</strong> ${formatDateTime(fakeSupport.sendTime)} (+${timeDiffFromNobleman} min nach Adel-Start)<br>
+                                    <strong>Ankunft:</strong> ${formatDateTime(fakeSupport.arrivalTime)} (gleichzeitig mit Adel)
+                                    <div class="timing-info">
+                                        Entfernung: ${fakeSupport.distance.toFixed(1)} Felder | Reisezeit: ${fakeSupport.travelTime} min | Einheit: ${unitName}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        resultHtml += `
+                            </div>
+                        `;
+                    }
+
+                    // Close the attack-plan div
+                    resultHtml += `
+                        </div>
+                    `;
+                }
+
+                // Statistics
+                const totalTroopsSent = allSupportPlans.reduce((sum, support) =>
+                    sum + support.spears + support.swords + support.heavy + support.rams + support.catapults, 0);
+
+                resultHtml += `
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${planData.length}</div>
+                            <div class="stat-label">Adelsangriffe</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${totalSupports}</div>
+                            <div class="stat-label">Support-Dörfer</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${totalTroopsSent}</div>
+                            <div class="stat-label">Truppen gesamt</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${totalFakes}</div>
+                            <div class="stat-label">Fake-Supports</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${troopData.length}</div>
+                            <div class="stat-label">Verfügbare Dörfer</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add copy button for BB code
+                resultHtml += `
+                    <div class="button-group">
+                        <button class="copy-btn" onclick="copyBBCode()">BB-Code kopieren</button>
+                        <button class="copy-btn" onclick="exportDSW()">DS Workbench exportieren</button>
+                        <button class="copy-btn" onclick="exportCSV()">CSV exportieren</button>
+                    </div>
+                `;
+                
+                document.getElementById('results').innerHTML = resultHtml;
+                const fakeMessage = totalFakes > 0 ? ` + ${totalFakes} Fake-Supports` : '';
+                showSuccess(`Support-Berechnung abgeschlossen! ${totalSupports} Support-Befehle${fakeMessage} für ${planData.length} Adelsangriffe erstellt.`);
+                
+            } catch (error) {
+                showError('Fehler beim Verarbeiten der Daten: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        function copyBBCode() {
+            // Generate BB code for the forum
+            let bbCode = '[b]Support-Plan[/b]\n\n';
+
+            for (const attack of planData) {
+                bbCode += `[b]Adelsangriff: ${attack.sourcePlayer} (${attack.source}) → ${attack.targetPlayer} (${attack.target})[/b]\n`;
+                bbCode += `Angreifer: ${attack.sourcePlayer} von ${attack.source}\n`;
+                bbCode += `Ziel: ${attack.targetPlayer} in ${attack.target}\n`;
+                bbCode += `Adel startet: ${formatDateTime(attack.startTime)}\n`;
+                bbCode += `Adel kommt an: ${formatDateTime(attack.arrivalTime)}\n\n`;
+
+                const config = {
+                    totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
+                    totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
+                    totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    maxDistance: parseInt(document.getElementById('maxDistance').value) || 30,
+                    maxTimeDiff: parseInt(document.getElementById('maxTimeDiff').value) || 999999,
+                    fakeSupports: parseInt(document.getElementById('fakeSupports').value) || 0,
+                    fakeUnitTypes: getSelectedFakeUnitTypes()
+                };
+
+                const supportPlans = findOptimalSupport(attack, troopData, config);
+
+                for (const support of supportPlans) {
+                    const timeDiffFromNobleman = Math.round(support.timeDiffFromNobleman / 60000);
+                    const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' :
+                                      support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
+
+                    bbCode += `Support von [coord]${support.coords}[/coord] → [coord]${attack.target}[/coord]\n`;
+                    bbCode += `Truppen: ${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavalerie${timingInfo}\n`;
+                    bbCode += `Senden: ${formatDateTime(support.sendTime)} (+${timeDiffFromNobleman} min nach Adel-Start)\n`;
+                    bbCode += `Ankunft: ${formatDateTime(support.arrivalTime)} (gleichzeitig mit Adel)\n\n`;
+                }
+
+                // Add fake supports if configured
+                if (config.fakeSupports > 0) {
+                    const usedVillages = new Set(supportPlans.map(s => s.coords));
+                    const fakeSupports = findFakeSupports(attack, troopData, usedVillages, config.fakeSupports, config.fakeUnitTypes, config);
+
+                    if (fakeSupports.length > 0) {
+                        bbCode += `[b]Fake-Supports:[/b]\n`;
+                        for (const fake of fakeSupports) {
+                            const timeDiffFromNobleman = Math.round(fake.timeDiffFromNobleman / 60000);
+                            const unitName = fake.slowestUnit === 'spear' ? 'Speerkämpfer' :
+                                           fake.slowestUnit === 'sword' ? 'Schwertkämpfer' :
+                                           fake.slowestUnit === 'axe' ? 'Axtkämpfer' :
+                                           fake.slowestUnit === 'spy' ? 'Späher' :
+                                           fake.slowestUnit === 'light' ? 'Leichte Kavallerie' :
+                                           fake.slowestUnit === 'heavy' ? 'Schwere Kavallerie' :
+                                           fake.slowestUnit;
+
+                            bbCode += `Fake von [coord]${fake.coords}[/coord] → [coord]${attack.target}[/coord]\n`;
+                            bbCode += `Truppen: 1x ${unitName}\n`;
+                            bbCode += `Senden: ${formatDateTime(fake.sendTime)} (+${timeDiffFromNobleman} min nach Adel-Start)\n`;
+                            bbCode += `Ankunft: ${formatDateTime(fake.arrivalTime)} (gleichzeitig mit Adel)\n\n`;
+                        }
+                    }
+                }
+            }
+            
+            navigator.clipboard.writeText(bbCode).then(() => {
+                showSuccess('BB-Code wurde in die Zwischenablage kopiert!');
+            }).catch(() => {
+                showError('Fehler beim Kopieren in die Zwischenablage.');
+            });
+        }
+
+        // Helper function to generate village ID from coordinates
+        function generateVillageId(x, y) {
+            return x * 1000 + y;
+        }
+
+        function exportDSW() {
+            let dswContent = '';
+
+            for (const attack of planData) {
+                const config = {
+                    totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
+                    totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
+                    totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    maxDistance: parseInt(document.getElementById('maxDistance').value) || 30,
+                    maxTimeDiff: parseInt(document.getElementById('maxTimeDiff').value) || 999999,
+                    fakeSupports: parseInt(document.getElementById('fakeSupports').value) || 0,
+                    fakeUnitTypes: getSelectedFakeUnitTypes()
+                };
+
+                const supportPlans = findOptimalSupport(attack, troopData, config);
+
+                for (const support of supportPlans) {
+                    // Create DS Workbench command for support
+                    const sourceCoords = support.coords.split('|').map(Number);
+                    const targetCoords = attack.target.split('|').map(Number);
+
+                    const sourceId = villageDataManager.coordinatesToVillageId(sourceCoords[0], sourceCoords[1]) ||
+                                   generateVillageId(sourceCoords[0], sourceCoords[1]);
+                    const targetId = villageDataManager.coordinatesToVillageId(targetCoords[0], targetCoords[1]) ||
+                                   generateVillageId(targetCoords[0], targetCoords[1]);
+
+                    // Determine unit type based on what we're sending
+					// fastest first so we overwrite with slower units
+                    let unitType = 'heavy';
+                    if (support.spears > 0) unitType = 'spear';
+                    if (support.swords > 0) unitType = 'sword';
+                    if (support.rams > 0) unitType = 'ram';
+                    if (support.catapults > 0) unitType = 'catapult';
+
+                    // Create troops string
+                    const troops = {};
+                    if (support.spears > 0) troops.spear = support.spears.toString();
+                    if (support.swords > 0) troops.sword = support.swords.toString();
+                    if (support.heavy > 0) troops.heavy = support.heavy.toString();
+                    if (support.rams > 0) troops.ram = support.rams.toString();
+                    if (support.catapults > 0) troops.catapult = support.catapults.toString();
+
+                    const troopsString = assembleTroopsString(troops);
+                    const arrivalTimestamp = support.arrivalTime.getTime();
+
+                    // Build DSW command: sourceId&targetId&unitType&arrivalTimestamp&attackType&unused&sent&troops
+                    const dswCommand = [
+                        sourceId,
+                        targetId,
+                        unitType,
+                        arrivalTimestamp,
+                        '0', // Support attack type
+                        'false', // unused
+                        'false', // sent
+                        troopsString
+                    ].join('&');
+
+                    dswContent += dswCommand + '\n';
+                }
+
+                // Add fake supports if configured
+                if (config.fakeSupports > 0) {
+                    const usedVillages = new Set(supportPlans.map(s => s.coords));
+                    const fakeSupports = findFakeSupports(attack, troopData, usedVillages, config.fakeSupports, config.fakeUnitTypes, config);
+
+                    for (const fake of fakeSupports) {
+                        const sourceCoords = fake.coords.split('|').map(Number);
+                        const targetCoords = attack.target.split('|').map(Number);
+
+                        const sourceId = villageDataManager.coordinatesToVillageId(sourceCoords[0], sourceCoords[1]) ||
+                                       generateVillageId(sourceCoords[0], sourceCoords[1]);
+                        const targetId = villageDataManager.coordinatesToVillageId(targetCoords[0], targetCoords[1]) ||
+                                       generateVillageId(targetCoords[0], targetCoords[1]);
+
+                        // Create troops string for fake (just 1 unit)
+                        const troops = {};
+                        troops[fake.slowestUnit] = '1';
+
+                        const troopsString = assembleTroopsString(troops);
+                        const arrivalTimestamp = fake.arrivalTime.getTime();
+
+                        // Build DSW command for fake support
+                        const dswCommand = [
+                            sourceId,
+                            targetId,
+                            fake.slowestUnit,
+                            arrivalTimestamp,
+                            '46', // Fake support attack type
+                            'false', // unused
+                            'false', // sent
+                            troopsString
+                        ].join('&');
+
+                        dswContent += dswCommand + '\n';
+                    }
+                }
+            }
+            
+            // Copy to clipboard or download
+            if (dswContent) {
+                // Try to copy to clipboard first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(dswContent).then(() => {
+                        showSuccess('DS Workbench Daten wurden in die Zwischenablage kopiert!');
+                    }).catch(() => {
+                        downloadFile(dswContent, 'support_plan.dsw');
+                    });
+                } else {
+                    // Fallback for browsers without clipboard API
+                    downloadFile(dswContent, 'support_plan.dsw');
+                }
+            } else {
+                showError('Keine Support-Daten zum Exportieren vorhanden.');
+            }
+        }
+
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showSuccess(`Datei ${filename} wurde heruntergeladen!`);
+        }
+
+        function exportCSV() {
+            let csv = 'Angreifer,Quelle,Ziel-Spieler,Ziel,Speere,Schwerter,Schwere Kavalerie,Rammbock,Katapult,Sendezeit,Ankunftszeit,Entfernung,Langsamste Einheit\n';
+            
+            for (const attack of planData) {
+                const supportPlans = findOptimalSupport(attack, troopData, {
+                    totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
+                    totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
+                    totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    maxDistance: parseInt(document.getElementById('maxDistance').value) || 30
+                });
+                
+                for (const support of supportPlans) {
+                    csv += `${attack.sourcePlayer},${support.coords},${attack.targetPlayer},${attack.target},${support.spears},${support.swords},${support.heavy},${support.rams},${support.catapults},${formatDateTime(support.sendTime)},${formatDateTime(support.arrivalTime)},${support.distance.toFixed(1)},${support.slowestUnit}\n`;
+                }
+            }
+            
+            downloadFile(csv, 'support_plan.csv');
+        }
+
+        function clearAll() {
+            document.getElementById('planInput').value = '';
+            document.getElementById('troopsInput').value = '';
+            document.getElementById('results').innerHTML = '';
+            planData = [];
+            troopData = [];
+            // Clear village data is handled by villageDataManager if needed
+
+            // Clear saved form data from localStorage
+            localStorage.removeItem('tw_support_planner_data');
+            console.log('Form data cleared from localStorage');
+        }
+
+        // LocalStorage functions for saving/loading form data
+        function saveFormData() {
+            const formData = {
+                planInput: document.getElementById('planInput').value,
+                troopsInput: document.getElementById('troopsInput').value,
+                worldInput: document.getElementById('worldInput').value,
+                totalSpears: document.getElementById('totalSpears').value,
+                totalSwords: document.getElementById('totalSwords').value,
+                totalHeavy: document.getElementById('totalHeavy').value,
+                maxDistance: document.getElementById('maxDistance').value,
+                maxTimeDiff: document.getElementById('maxTimeDiff').value,
+                fakeSupports: document.getElementById('fakeSupports').value,
+                planFormat: currentInputFormat,
+                troopFormat: currentTroopFormat,
+                fakeUnitTypes: Array.from(document.querySelectorAll('.fakeUnitCheckbox:checked')).map(cb => cb.value)
+            };
+
+            try {
+                localStorage.setItem('tw_support_planner_data', JSON.stringify(formData));
+                console.log('Form data saved to localStorage');
+            } catch (error) {
+                console.warn('Failed to save form data to localStorage:', error);
+            }
+        }
+
+        function loadFormData() {
+            try {
+                const savedData = localStorage.getItem('tw_support_planner_data');
+                if (!savedData) return false;
+
+                const formData = JSON.parse(savedData);
+
+                // Restore input values
+                if (formData.planInput) document.getElementById('planInput').value = formData.planInput;
+                if (formData.troopsInput) document.getElementById('troopsInput').value = formData.troopsInput;
+                if (formData.worldInput) document.getElementById('worldInput').value = formData.worldInput;
+                if (formData.totalSpears) document.getElementById('totalSpears').value = formData.totalSpears;
+                if (formData.totalSwords) document.getElementById('totalSwords').value = formData.totalSwords;
+                if (formData.totalHeavy) document.getElementById('totalHeavy').value = formData.totalHeavy;
+                if (formData.maxDistance) document.getElementById('maxDistance').value = formData.maxDistance;
+                if (formData.maxTimeDiff) document.getElementById('maxTimeDiff').value = formData.maxTimeDiff;
+                if (formData.fakeSupports) document.getElementById('fakeSupports').value = formData.fakeSupports;
+
+                // Restore format selections
+                if (formData.planFormat) {
+                    currentInputFormat = formData.planFormat;
+                    if (formData.planFormat === 'bb') {
+                        document.getElementById('bbFormat').checked = true;
+                    } else {
+                        document.getElementById('dswFormat').checked = true;
+                    }
+                }
+
+                if (formData.troopFormat) {
+                    currentTroopFormat = formData.troopFormat;
+                    if (formData.troopFormat === 'standard') {
+                        document.getElementById('standardTroopFormat').checked = true;
+                    } else {
+                        document.getElementById('tribeTroopFormat').checked = true;
+                    }
+                }
+
+                // Restore fake unit type checkboxes
+                if (formData.fakeUnitTypes) {
+                    // First uncheck all
+                    document.querySelectorAll('.fakeUnitCheckbox').forEach(cb => cb.checked = false);
+                    // Then check the saved ones
+                    formData.fakeUnitTypes.forEach(unitType => {
+                        const checkbox = document.querySelector(`.fakeUnitCheckbox[value="${unitType}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+
+                console.log('Form data loaded from localStorage');
+                return true;
+            } catch (error) {
+                console.warn('Failed to load form data from localStorage:', error);
+                return false;
+            }
+        }
+
+        function togglePlanFormat() {
+            const bbFormat = document.getElementById('bbFormat').checked;
+            const dswFormat = document.getElementById('dswFormat').checked;
+
+            currentInputFormat = bbFormat ? 'bb' : 'dsw';
+
+            const planInput = document.getElementById('planInput');
+            if (currentInputFormat === 'bb') {
+                planInput.placeholder = 'Fügen Sie hier Ihren Adelsplan im BB-Code Format ein...';
+                if (window.exampleData && !planInput.value) {
+                    planInput.value = window.exampleData.bb;
+                }
+            } else {
+                planInput.placeholder = 'Fügen Sie hier Ihren Adelsplan im DS Workbench Format ein...';
+                if (window.exampleData && !planInput.value) {
+                    planInput.value = window.exampleData.dsw;
+                }
+            }
+
+            // Save format change
+            saveFormData();
+
+            // Clear results when format changes
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function toggleTroopFormat() {
+            const standardFormat = document.getElementById('standardTroopFormat').checked;
+            const tribeFormat = document.getElementById('tribeTroopFormat').checked;
+
+            currentTroopFormat = standardFormat ? 'standard' : 'tribe';
+
+            const troopsInput = document.getElementById('troopsInput');
+            if (currentTroopFormat === 'standard') {
+                troopsInput.placeholder = 'Fügen Sie hier Ihre Truppen-Übersicht im Standard-Format ein...';
+                if (window.exampleData && !troopsInput.value) {
+                    troopsInput.value = window.exampleData.troops;
+                }
+            } else {
+                troopsInput.placeholder = 'Fügen Sie hier Ihre Truppen-Übersicht im Tribe Info Format ein (CSV: Coords,Player,spear,sword,...)...';
+                if (window.exampleData && !troopsInput.value) {
+                    troopsInput.value = window.exampleData.tribeTroops || '';
+                }
+            }
+
+            // Save format change
+            saveFormData();
+
+            // Clear results when format changes
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function handleTribeInfoFile(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            // Check if file is a .txt file
+            if (!file.name.endsWith('.txt')) {
+                alert('Bitte wählen Sie eine .txt Datei aus.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const contents = e.target.result;
+
+                // Auto-select Tribe Info Format
+                document.getElementById('tribeTroopFormat').checked = true;
+                currentTroopFormat = 'tribe';
+
+                // Update placeholder
+                const troopsInput = document.getElementById('troopsInput');
+                troopsInput.placeholder = 'Fügen Sie hier Ihre Truppen-Übersicht im Tribe Info Format ein (CSV: Coords,Player,spear,sword,...)...';
+
+                // Set the file contents to the textarea
+                troopsInput.value = contents;
+
+                // Show success message
+                const statusSpan = document.getElementById('fileUploadStatus');
+                statusSpan.textContent = `✓ ${file.name} erfolgreich geladen`;
+                statusSpan.style.color = '#10b981';
+
+                // Clear status after 3 seconds
+                setTimeout(() => {
+                    statusSpan.textContent = '';
+                }, 3000);
+
+                // Clear results
+                document.getElementById('results').innerHTML = '';
+            };
+
+            reader.onerror = function() {
+                alert('Fehler beim Lesen der Datei.');
+                const statusSpan = document.getElementById('fileUploadStatus');
+                statusSpan.textContent = '✗ Fehler beim Laden';
+                statusSpan.style.color = '#ef4444';
+            };
+
+            reader.readAsText(file);
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            document.getElementById('results').appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success';
+            successDiv.textContent = message;
+            document.getElementById('results').appendChild(successDiv);
+            setTimeout(() => successDiv.remove(), 5000);
+        }
+
+        // Auto-fill with provided data on page load
+        window.addEventListener('load', function() {
+            // Debug: Check if villageDataManager is available
+            console.log('villageDataManager available:', typeof villageDataManager);
+            console.log('villageDataManager object:', villageDataManager);
+
+            // Update village data status
+            updateVillageDataStatus();
+
+            // BB Code example
+            const planDataBB = `[b]test target[/b]
+
+Roter Punkt von [b]BetterCallSaul[/b] aus [coord]563|593[/coord] mit [unit]snob[/unit] auf [b]BetterCallSaul[/b]  in [coord]543|589[/coord] startet am [color=#ff0e0e]2025-07-06 19:53:29:0[/color] und kommt am [color=#2eb92e]2025-07-07 07:47:21:0[/color] an ([url="https://de230.die-staemme.de/game.php?village=13168&screen=place&target=10330&spear=0&sword=0&axe=0&archer=&spy=0&light=10&marcher=&heavy=0&ram=0&catapult=0&knight=&snob=1"]Versammlungsplatz[/url])
+Roter Punkt von [b]BetterCallSaul[/b] aus [coord]532|565[/coord] mit [unit]snob[/unit] auf [b]BetterCallSaul[/b]  in [coord]532|585[/coord] startet am [color=#ff0e0e]2025-07-06 20:04:43:0[/color] und kommt am [color=#2eb92e]2025-07-07 07:44:43:0[/color] an ([url="https://de230.die-staemme.de/game.php?village=2318&screen=place&target=8721&spear=0&sword=0&axe=0&archer=&spy=0&light=10&marcher=&heavy=0&ram=0&catapult=0&knight=&snob=1"]Versammlungsplatz[/url])
+Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[/unit] auf [b]KingJ1111[/b]  in [coord]530|582[/coord] startet am [color=#ff0e0e]2025-07-06 20:21:19:0[/color] und kommt am [color=#2eb92e]2025-07-07 07:00:00:0[/color] an ([url="https://de230.die-staemme.de/game.php?village=3279&screen=place&target=8079&spear=0&sword=0&axe=0&archer=&spy=0&light=10&marcher=&heavy=0&ram=0&catapult=0&knight=&snob=1"]Versammlungsplatz[/url])`;
+
+            // DS Workbench example
+            const planDataDSW = `563593&543589&snob&1720334841000&11&false&false&c25vYj0x/bGlnaHQ9MTA%3D/militia=MA==
+532565&532585&snob&1720334683000&11&false&false&c25vYj0x/bGlnaHQ9MTA%3D/militia=MA==
+527564&530582&snob&1720332000000&11&false&false&c25vYj0x/bGlnaHQ9MTA%3D/militia=MA==`;
+
+            const troopData = `021.Dorf (502|547) K55 	eigene	1600	0	5200	230	0	479	360	132	0	Befehle
+022.Dorf (503|552) K55 	eigene	200	151	2046	407	1194	5	239	63	0	Befehle
+075 (560|595) K55  	eigene	2684	0	0	0	0	433	0	0	0	Befehle
+55:83:25 | Syrax (535|582) K55 	eigene	890	50	0	38	0	193	10	48	0	Befehle
+55:83:42 | Caraxes (532|584) K55 	eigene	0	0	0	0	0	0	0	0	0	Befehle
+55:83:45 | Vhagar (535|584) K55 	eigene	1190	5	0	38	0	78	8	52	0	Befehle
+55:83:50 | Meleys (530|585) K55 	eigene	827	1	0	42	0	159	1	47	0	Befehle
+55:83:98 | Meraxes (538|589) K55 	eigene	53	5	32	20	18	7	5	7	0	Befehle
+55.53.08 (538|550) K55 	eigene	5375	988	0	256	41	322	8	140	0	Befehle
+55.53.24 (534|552) K55 	eigene	698	1000	4188	33	1388	0	15	65	0	Befehle
+55.54.31 (541|553) K55 	eigene	6378	5	0	256	26	749	8	148	0	Befehle
+55.62.39 (529|563) K55 	eigene	1475	1532	3089	75	184	0	10	97	0	Befehle`;
+
+            // Store both examples for format switching
+            window.exampleData = {
+                bb: planDataBB,
+                dsw: planDataDSW,
+                troops: troopData
+            };
+
+            // Try to load saved data, if none exists use examples
+            const dataLoaded = loadFormData();
+            if (!dataLoaded) {
+                // Load BB code example by default if no saved data
+                document.getElementById('planInput').value = planDataBB;
+                document.getElementById('troopsInput').value = troopData;
+            }
+
+            // Add event listeners to save data on input changes
+            const inputIds = ['planInput', 'troopsInput', 'worldInput', 'totalSpears', 'totalSwords',
+                             'totalHeavy', 'maxDistance', 'maxTimeDiff', 'fakeSupports'];
+
+            inputIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    // Save on input change with debounce to avoid excessive saves
+                    let saveTimeout;
+                    element.addEventListener('input', function() {
+                        clearTimeout(saveTimeout);
+                        saveTimeout = setTimeout(() => saveFormData(), 500);
+                    });
+                }
+            });
+
+            // Add event listeners for checkboxes
+            document.querySelectorAll('.fakeUnitCheckbox').forEach(checkbox => {
+                checkbox.addEventListener('change', () => saveFormData());
+            });
+
+            // Load defense tool saved data
+            loadDefenseFormData();
+
+            // Add event listeners for defense tool inputs
+            const defInputIds = ['sosInput', 'defTroopsInput', 'defWorldInput', 'defMinTimeBefore',
+                                 'defSupportSpears', 'defSupportSwords', 'defSupportHeavy'];
+
+            defInputIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    // Save on input change with debounce to avoid excessive saves
+                    let saveTimeout;
+                    element.addEventListener('input', function() {
+                        clearTimeout(saveTimeout);
+                        saveTimeout = setTimeout(() => saveDefenseFormData(), 500);
+                    });
+                }
+            });
+
+            // Add event listeners for defense tool radio buttons
+            document.querySelectorAll('input[name="defTroopFormat"]').forEach(radio => {
+                radio.addEventListener('change', () => saveDefenseFormData());
+            });
+
+            document.querySelectorAll('input[name="defOutputFormat"]').forEach(radio => {
+                radio.addEventListener('change', () => saveDefenseFormData());
+            });
+        });
+
+        // ========================
+        // DEFENSE SUPPORT TOOL (TOOL 2)
+        // ========================
+
+        let defTroopFormat = 'standard';
+        let defSOSData = [];
+        let defAvailableTroops = [];
+        let defCalculatedSupports = [];
+
+        function toggleDefTroopFormat() {
+            const standardFormat = document.getElementById('defStandardFormat').checked;
+            defTroopFormat = standardFormat ? 'standard' : 'tribe';
+            console.log('Defense troop format changed to:', defTroopFormat);
+        }
+
+        function handleDefTribeInfoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('defTroopsInput').value = content;
+                defTroopFormat = 'tribe';
+                document.getElementById('defTribeFormat').checked = true;
+
+                const statusSpan = document.getElementById('defFileUploadStatus');
+                statusSpan.textContent = `✓ ${file.name} erfolgreich geladen`;
+                statusSpan.style.color = '#10b981';
+
+                setTimeout(() => {
+                    statusSpan.textContent = '';
+                }, 3000);
+
+                document.getElementById('defResults').innerHTML = '';
+            };
+
+            reader.onerror = function() {
+                alert('Fehler beim Lesen der Datei.');
+                const statusSpan = document.getElementById('defFileUploadStatus');
+                statusSpan.textContent = '✗ Fehler beim Laden';
+                statusSpan.style.color = '#ef4444';
+            };
+
+            reader.readAsText(file);
+        }
+
+        function parseSOSData(sosText) {
+            const attacks = [];
+            const lines = sosText.split('\n');
+
+            let currentVillage = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                // Parse village coordinates
+                const villageMatch = line.match(/\[coord\](\d+)\|(\d+)\[\/coord\]/);
+                if (villageMatch && line.includes('[b]Dorf:[/b]')) {
+                    currentVillage = {
+                        x: parseInt(villageMatch[1]),
+                        y: parseInt(villageMatch[2])
+                    };
+                    continue;
+                }
+
+                // Parse attack lines
+                const attackMatch = line.match(/\[command\]attack\[\/command\].*?\[coord\](\d+)\|(\d+)\[\/coord\].*?Ankunftszeit:\s*(\d{2}\.\d{2}\.\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+                if (attackMatch && currentVillage) {
+                    const attackerX = parseInt(attackMatch[1]);
+                    const attackerY = parseInt(attackMatch[2]);
+                    const dateStr = attackMatch[3]; // DD.MM.YY
+                    const timeStr = attackMatch[4]; // HH:MM:SS
+
+                    // Parse date
+                    const dateParts = dateStr.split('.');
+                    const timeParts = timeStr.split(':');
+                    const year = 2000 + parseInt(dateParts[2]);
+                    const month = parseInt(dateParts[1]) - 1;
+                    const day = parseInt(dateParts[0]);
+                    const hour = parseInt(timeParts[0]);
+                    const minute = parseInt(timeParts[1]);
+                    const second = parseInt(timeParts[2]);
+
+                    const arrivalTime = new Date(year, month, day, hour, minute, second);
+
+                    attacks.push({
+                        targetVillage: currentVillage,
+                        attackerCoords: { x: attackerX, y: attackerY },
+                        arrivalTime: arrivalTime,
+                        arrivalTimeStr: `${dateStr} ${timeStr}`
+                    });
+                }
+            }
+
+            return attacks;
+        }
+
+        function parseDefTroopsData(troopsText, format) {
+            const troops = [];
+
+            if (format === 'tribe') {
+                // Parse tribe info format
+                const lines = troopsText.split('\n');
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+
+                    const parts = line.split('\t');
+                    if (parts.length < 13) continue;
+
+                    const villageName = parts[0];
+                    const coordMatch = parts[1]?.match(/(\d+)\|(\d+)/);
+
+                    if (coordMatch) {
+                        troops.push({
+                            name: villageName,
+                            coords: `${coordMatch[1]}|${coordMatch[2]}`,
+                            x: parseInt(coordMatch[1]),
+                            y: parseInt(coordMatch[2]),
+                            spears: parseInt(parts[2]) || 0,
+                            swords: parseInt(parts[3]) || 0,
+                            axes: parseInt(parts[4]) || 0,
+                            archers: parseInt(parts[5]) || 0,
+                            spies: parseInt(parts[6]) || 0,
+                            light: parseInt(parts[7]) || 0,
+                            marchers: parseInt(parts[8]) || 0,
+                            heavy: parseInt(parts[9]) || 0,
+                            rams: parseInt(parts[10]) || 0,
+                            catapults: parseInt(parts[11]) || 0,
+                            nobles: parseInt(parts[12]) || 0
+                        });
+                    }
+                }
+            } else {
+                // Parse standard format
+                // Village name and "eigene" are on the same line:
+                // "BCS 001 - Off; Bunker; Süden - (411|496) K44  	eigene	2277	5	1965..."
+                const lines = troopsText.split('\n');
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (!line.trim()) continue;
+
+                    // Look for lines that contain both coordinates and "eigene"
+                    if (line.includes('eigene')) {
+                        const coordMatch = line.match(/\((\d+)\|(\d+)\)/);
+                        if (!coordMatch) continue;
+
+                        // Extract village name (everything before the coordinates)
+                        const nameMatch = line.match(/^(.+?)\s*\(\d+\|\d+\)/);
+                        const villageName = nameMatch ? nameMatch[1].trim() : `Dorf (${coordMatch[1]}|${coordMatch[2]})`;
+
+                        // Split by tabs
+                        const parts = line.split('\t');
+
+                        // Find the troop numbers (they come after "eigene")
+                        let troopNumbers = [];
+                        let foundEigene = false;
+                        for (let j = 0; j < parts.length; j++) {
+                            if (parts[j].trim() === 'eigene') {
+                                foundEigene = true;
+                                continue;
+                            }
+                            if (foundEigene) {
+                                // Remove dots (thousand separators) and parse
+                                const num = parseInt(parts[j].replace(/\./g, '').trim());
+                                if (!isNaN(num)) {
+                                    troopNumbers.push(num);
+                                }
+                            }
+                        }
+
+                        // We need at least 10 troop values (spears through nobles)
+                        if (troopNumbers.length >= 10) {
+                            const villageData = {
+                                name: villageName,
+                                coords: `${coordMatch[1]}|${coordMatch[2]}`,
+                                x: parseInt(coordMatch[1]),
+                                y: parseInt(coordMatch[2]),
+                                spears: troopNumbers[0] || 0,
+                                swords: troopNumbers[1] || 0,
+                                axes: troopNumbers[2] || 0,
+                                spies: troopNumbers[3] || 0,
+                                light: troopNumbers[4] || 0,
+                                heavy: troopNumbers[5] || 0,
+                                rams: troopNumbers[6] || 0,
+                                catapults: troopNumbers[7] || 0,
+                                nobles: troopNumbers[9] || 0
+                            };
+                            troops.push(villageData);
+                            console.log(`Parsed village ${villageData.name} (${villageData.coords}) eigene troops:`, villageData);
+                        }
+                    }
+                }
+            }
+
+            return troops;
+        }
+
+        function calculateDefenseSupport() {
+            // Get inputs
+            const sosText = document.getElementById('sosInput').value;
+            const troopsText = document.getElementById('defTroopsInput').value;
+            const minTimeBefore = parseInt(document.getElementById('defMinTimeBefore').value) || 5;
+            const spearsPerSupport = parseInt(document.getElementById('defSupportSpears').value) || 0;
+            const swordsPerSupport = parseInt(document.getElementById('defSupportSwords').value) || 0;
+            const heavyPerSupport = parseInt(document.getElementById('defSupportHeavy').value) || 0;
+            const useTimeOptimization = document.getElementById('defUseTimeOptimization').checked;
+            const outputFormat = document.querySelector('input[name="defOutputFormat"]:checked').value;
+
+            console.log('=== DEFENSE SUPPORT CALCULATION START ===');
+            console.log('Config:', {
+                minTimeBefore,
+                spearsPerSupport,
+                swordsPerSupport,
+                heavyPerSupport,
+                useTimeOptimization,
+                outputFormat,
+                troopFormat: defTroopFormat
+            });
+
+            // Validate inputs
+            if (!sosText || !troopsText) {
+                showDefError('Bitte füllen Sie beide Eingabefelder aus.');
+                return;
+            }
+
+            // Parse data
+            defSOSData = parseSOSData(sosText);
+            defAvailableTroops = parseDefTroopsData(troopsText, defTroopFormat);
+
+            console.log(`Parsed ${defSOSData.length} attacks:`, defSOSData);
+            console.log(`Parsed ${defAvailableTroops.length} villages:`, defAvailableTroops);
+
+            if (defSOSData.length === 0) {
+                showDefError('Keine Angriffe in den SOS-Daten gefunden.');
+                return;
+            }
+
+            if (defAvailableTroops.length === 0) {
+                showDefError('Keine Truppen in der Truppen-Übersicht gefunden.');
+                return;
+            }
+
+            // Calculate supports
+            const supports = [];
+            const now = new Date();
+            console.log('Current time:', now);
+
+            const usedVillages = new Map(); // Track troops used from each village
+
+            // Initialize used troops tracking
+            defAvailableTroops.forEach(village => {
+                usedVillages.set(village.coords, {
+                    spears: 0,
+                    swords: 0,
+                    heavy: 0,
+                    rams: 0,
+                    catapults: 0
+                });
+            });
+
+            for (const attack of defSOSData) {
+                console.log(`\n--- Processing attack on ${attack.targetVillage.x}|${attack.targetVillage.y} at ${attack.arrivalTimeStr} ---`);
+                let supportFound = false;
+                let rejectionReasons = [];
+
+                // Sort villages by distance to target
+                const sortedVillages = [...defAvailableTroops].sort((a, b) => {
+                    const distA = calculateDistance(
+                        `${a.x}|${a.y}`,
+                        `${attack.targetVillage.x}|${attack.targetVillage.y}`
+                    );
+                    const distB = calculateDistance(
+                        `${b.x}|${b.y}`,
+                        `${attack.targetVillage.x}|${attack.targetVillage.y}`
+                    );
+                    return distA - distB;
+                });
+
+                console.log(`Trying ${sortedVillages.length} villages...`);
+
+                for (const village of sortedVillages) {
+                    // Skip if village is the same as the target (can't support itself)
+                    if (village.x === attack.targetVillage.x && village.y === attack.targetVillage.y) {
+                        const reason = `Cannot support itself`;
+                        console.log(`  ❌ Skipping ${village.coords}: ${reason}`);
+                        rejectionReasons.push(`${village.coords}: ${reason}`);
+                        continue;
+                    }
+
+                    const used = usedVillages.get(village.coords);
+                    const availableSpears = village.spears - used.spears;
+                    const availableSwords = village.swords - used.swords;
+                    const availableHeavy = village.heavy - used.heavy;
+                    const availableRams = village.rams - used.rams;
+                    const availableCatapults = village.catapults - used.catapults;
+
+                    console.log(`  Checking village ${village.coords}:`, {
+                        availableSpears,
+                        availableSwords,
+                        availableHeavy,
+                        availableRams,
+                        availableCatapults,
+                        requiredSpears: spearsPerSupport,
+                        requiredSwords: swordsPerSupport,
+                        requiredHeavy: heavyPerSupport
+                    });
+
+                    // Check if village has enough troops
+                    if (availableSpears < spearsPerSupport ||
+                        availableSwords < swordsPerSupport ||
+                        availableHeavy < heavyPerSupport) {
+                        const reason = `Insufficient troops (have: ${availableSpears}/${availableSwords}/${availableHeavy}, need: ${spearsPerSupport}/${swordsPerSupport}/${heavyPerSupport})`;
+                        console.log(`    ❌ ${reason}`);
+                        rejectionReasons.push(`${village.coords}: ${reason}`);
+                        continue;
+                    }
+
+                    // Calculate distance and travel time
+                    const distance = calculateDistance(
+                        `${village.x}|${village.y}`,
+                        `${attack.targetVillage.x}|${attack.targetVillage.y}`
+                    );
+
+                    // Determine the slowest unit among the troops being sent
+                    // Speeds: spear=18, sword=22, heavy=11 (sword is slowest!)
+                    let baseSlowestUnit = 'heavy';
+                    if (swordsPerSupport > 0) {
+                        baseSlowestUnit = 'sword';  // 22 min/field - slowest of the three
+                    } else if (spearsPerSupport > 0) {
+                        baseSlowestUnit = 'spear';  // 18 min/field
+                    }
+                    // else use heavy (11 min/field)
+
+                    // Start with base configuration
+                    let bestOption = {
+                        spears: spearsPerSupport,
+                        swords: swordsPerSupport,
+                        heavy: heavyPerSupport,
+                        rams: 0,
+                        catapults: 0,
+                        slowestUnit: baseSlowestUnit
+                    };
+
+                    // Calculate base travel time with the actual slowest unit
+                    const baseTravelTime = calculateTravelTime(distance, baseSlowestUnit);
+                    let sendTime = new Date(attack.arrivalTime.getTime() - baseTravelTime * 60000);
+                    let timeUntilSend = sendTime.getTime() - now.getTime();
+                    const minTimeBeforeMs = minTimeBefore * 60 * 1000;
+
+                    console.log(`    Distance: ${distance.toFixed(2)} fields`);
+                    console.log(`    Base slowest unit: ${baseSlowestUnit}`);
+                    console.log(`    Base travel time: ${baseTravelTime} minutes`);
+                    console.log(`    Base send time: ${formatDateTime(sendTime)}`);
+                    console.log(`    Time until send: ${Math.round(timeUntilSend / 60000)} minutes`);
+
+                    // Check if we can still send in time with base config
+                    if (timeUntilSend < minTimeBeforeMs) {
+                        const reason = `Too late to send (send in ${Math.round(timeUntilSend / 60000)} min, need ${minTimeBefore} min buffer)`;
+                        console.log(`    ❌ ${reason}`);
+                        rejectionReasons.push(`${village.coords}: ${reason}`);
+                        continue;
+                    }
+
+                    // Time optimization: Try adding ram or catapult if enabled
+                    // For defense, we want to send as EARLY as possible (more buffer time)
+                    // Slower units (ram/catapult) need to leave earlier for the same arrival time
+                    if (useTimeOptimization && timeUntilSend >= 0) {
+                        console.log(`    Checking time optimization...`);
+
+                        // Try adding a ram if available
+                        if (availableRams > 0) {
+                            const travelTimeWithRam = calculateTravelTime(distance, 'ram');
+                            const sendTimeWithRam = new Date(attack.arrivalTime.getTime() - travelTimeWithRam * 60000);
+                            const timeUntilSendWithRam = sendTimeWithRam.getTime() - now.getTime();
+
+                            console.log(`      Ram option: travel=${travelTimeWithRam}min, send=${formatDateTime(sendTimeWithRam)}`);
+
+                            // If ram gives earlier send time (more buffer, better for defense), use it
+                            if (sendTimeWithRam < sendTime && timeUntilSendWithRam >= minTimeBeforeMs) {
+                                console.log(`      ✅ Ram improves timing (earlier send)!`);
+                                bestOption.rams = 1;
+                                bestOption.slowestUnit = 'ram';
+                                sendTime = sendTimeWithRam;
+                                timeUntilSend = timeUntilSendWithRam;
+                            }
+                        }
+
+                        // Try adding a catapult if available and no ram was better
+                        if (availableCatapults > 0 && bestOption.rams === 0) {
+                            const travelTimeWithCatapult = calculateTravelTime(distance, 'catapult');
+                            const sendTimeWithCatapult = new Date(attack.arrivalTime.getTime() - travelTimeWithCatapult * 60000);
+                            const timeUntilSendWithCatapult = sendTimeWithCatapult.getTime() - now.getTime();
+
+                            console.log(`      Catapult option: travel=${travelTimeWithCatapult}min, send=${formatDateTime(sendTimeWithCatapult)}`);
+
+                            // If catapult gives earlier send time (more buffer, better for defense), use it
+                            if (sendTimeWithCatapult < sendTime && timeUntilSendWithCatapult >= minTimeBeforeMs) {
+                                console.log(`      ✅ Catapult improves timing (earlier send)!`);
+                                bestOption.catapults = 1;
+                                bestOption.slowestUnit = 'catapult';
+                                sendTime = sendTimeWithCatapult;
+                                timeUntilSend = timeUntilSendWithCatapult;
+                            }
+                        }
+                    }
+
+                    // Create support with best option
+                    const travelTimeMinutes = Math.round((attack.arrivalTime.getTime() - sendTime.getTime()) / 60000);
+                    console.log(`    ✅ SUPPORT FOUND! Sending from ${village.coords} (slowest: ${bestOption.slowestUnit})`);
+
+                    supports.push({
+                        sourceVillage: village,
+                        targetVillage: attack.targetVillage,
+                        attackArrival: attack.arrivalTime,
+                        attackArrivalStr: attack.arrivalTimeStr,
+                        sendTime: sendTime,
+                        arrivalTime: attack.arrivalTime,
+                        spears: bestOption.spears,
+                        swords: bestOption.swords,
+                        heavy: bestOption.heavy,
+                        rams: bestOption.rams,
+                        catapults: bestOption.catapults,
+                        slowestUnit: bestOption.slowestUnit,
+                        distance: distance,
+                        travelTimeMinutes: travelTimeMinutes,
+                        canSendNow: timeUntilSend >= 0
+                    });
+
+                    // Mark troops as used
+                    used.spears += bestOption.spears;
+                    used.swords += bestOption.swords;
+                    used.heavy += bestOption.heavy;
+                    used.rams += bestOption.rams;
+                    used.catapults += bestOption.catapults;
+
+                    supportFound = true;
+                    break; // One support per attack
+                }
+
+                if (!supportFound) {
+                    console.log(`  ❌ NO SUPPORT FOUND for attack on ${attack.targetVillage.x}|${attack.targetVillage.y}`);
+                    console.log(`  Rejection reasons:`, rejectionReasons);
+                    supports.push({
+                        targetVillage: attack.targetVillage,
+                        attackArrival: attack.arrivalTime,
+                        attackArrivalStr: attack.arrivalTimeStr,
+                        error: 'Keine verfügbaren Truppen oder zu spät',
+                        rejectionReasons: rejectionReasons
+                    });
+                }
+            }
+
+            console.log('\n=== DEFENSE SUPPORT CALCULATION END ===');
+            console.log(`Total supports created: ${supports.filter(s => !s.error).length}`);
+            console.log(`Failed supports: ${supports.filter(s => s.error).length}`);
+
+            // Display results
+            displayDefenseSupports(supports, outputFormat);
+        }
+
+        function displayDefenseSupports(supports, outputFormat) {
+            const resultsDiv = document.getElementById('defResults');
+
+            // Store for export functions
+            defCalculatedSupports = supports;
+
+            const validSupports = supports.filter(s => !s.error);
+            const failedSupports = supports.filter(s => s.error);
+
+            let resultHtml = '<div class="container">';
+            resultHtml += '<h2 style="color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 8px;">🛡️ Tab Plan</h2>';
+
+            // Valid supports
+            if (validSupports.length > 0) {
+                resultHtml += `<div class="support-list">`;
+                resultHtml += `<h4>✅ Erfolgreiche Supports (${validSupports.length})</h4>`;
+
+                for (const support of validSupports) {
+                    const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' :
+                                      support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
+
+                    let troopText = `${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavallerie`;
+                    if (support.rams > 0) {
+                        troopText += `, ${support.rams} Rammbock`;
+                    }
+                    if (support.catapults > 0) {
+                        troopText += `, ${support.catapults} Katapult`;
+                    }
+
+                    // Get village names
+                    const sourceVillageName = support.sourceVillage.name ||
+                        villageDataManager.getVillageNameByCoords(support.sourceVillage.x, support.sourceVillage.y) ||
+                        `Dorf`;
+                    const targetVillageName = villageDataManager.getVillageNameByCoords(support.targetVillage.x, support.targetVillage.y) ||
+                        `Dorf`;
+
+                    resultHtml += `
+                        <div class="support-item">
+                            <strong>Support für ${targetVillageName} (${support.targetVillage.x}|${support.targetVillage.y})</strong>${timingInfo}<br>
+                            Von: <strong>${sourceVillageName}</strong> (${support.sourceVillage.coords})<br>
+                            Truppen: ${troopText}<br>
+                            <strong>Senden:</strong> ${formatDateTime(support.sendTime)}<br>
+                            <strong>Ankunft:</strong> ${formatDateTime(support.arrivalTime)} (zeitgleich mit Angriff)
+                            <div class="timing-info">
+                                Entfernung: ${support.distance.toFixed(1)} Felder | Reisezeit: ${support.travelTimeMinutes} min | Langsamste Einheit: ${support.slowestUnit}
+                            </div>
+                        </div>
+                    `;
+                }
+                resultHtml += `</div>`;
+            }
+
+            // Failed supports
+            if (failedSupports.length > 0) {
+                resultHtml += `
+                    <div class="support-list" style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; margin-top: 20px;">
+                        <h4 style="color: #fca5a5;">❌ Fehlgeschlagene Supports (${failedSupports.length})</h4>
+                `;
+
+                for (const support of failedSupports) {
+                    const targetVillageName = villageDataManager.getVillageNameByCoords(support.targetVillage.x, support.targetVillage.y) ||
+                        `Dorf`;
+
+                    resultHtml += `
+                        <div class="support-item" style="border-color: rgba(239, 68, 68, 0.3);">
+                            <strong>Ziel: ${targetVillageName} (${support.targetVillage.x}|${support.targetVillage.y})</strong><br>
+                            Ankunftszeit: ${support.attackArrivalStr}<br>
+                            <span style="color: #fca5a5;">Fehler: ${support.error}</span>
+                        </div>
+                    `;
+                }
+                resultHtml += `</div>`;
+            }
+
+            // Statistics
+            const totalTroopsSent = validSupports.reduce((sum, s) =>
+                sum + s.spears + s.swords + s.heavy + (s.rams || 0) + (s.catapults || 0), 0);
+            const totalRams = validSupports.reduce((sum, s) => sum + (s.rams || 0), 0);
+            const totalCatapults = validSupports.reduce((sum, s) => sum + (s.catapults || 0), 0);
+
+            resultHtml += `
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${defSOSData.length}</div>
+                        <div class="stat-label">Angriffe</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${validSupports.length}</div>
+                        <div class="stat-label">Supports gesendet</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${totalTroopsSent}</div>
+                        <div class="stat-label">Truppen gesamt</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${failedSupports.length}</div>
+                        <div class="stat-label">Fehlgeschlagen</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${defAvailableTroops.length}</div>
+                        <div class="stat-label">Verfügbare Dörfer</div>
+                    </div>
+                </div>
+            `;
+
+            // Export buttons
+            resultHtml += `
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyDefBBCode()">BB-Code kopieren</button>
+                    <button class="copy-btn" onclick="exportDefDSW()">DS Workbench exportieren</button>
+                </div>
+            `;
+
+            resultHtml += '</div>';
+            resultsDiv.innerHTML = resultHtml;
+
+            showDefSuccess(`Support-Berechnung abgeschlossen! ${validSupports.length} Support-Befehle für ${defSOSData.length} Angriffe erstellt.`);
+        }
+
+        function copyDefBBCode() {
+            const validSupports = defCalculatedSupports.filter(s => !s.error);
+            const failedSupports = defCalculatedSupports.filter(s => s.error);
+
+            let bbCode = '[b]Tab Plan[/b]\n\n';
+
+            // Valid supports
+            if (validSupports.length > 0) {
+                bbCode += '[b]Erfolgreiche Supports:[/b]\n\n';
+
+                for (const support of validSupports) {
+                    const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' :
+                                      support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
+
+                    let troopText = `${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavallerie`;
+                    if (support.rams > 0) {
+                        troopText += `, ${support.rams} Rammbock`;
+                    }
+                    if (support.catapults > 0) {
+                        troopText += `, ${support.catapults} Katapult`;
+                    }
+
+                    // Get village names
+                    const sourceVillageName = support.sourceVillage.name ||
+                        villageDataManager.getVillageNameByCoords(support.sourceVillage.x, support.sourceVillage.y) ||
+                        `Dorf`;
+                    const targetVillageName = villageDataManager.getVillageNameByCoords(support.targetVillage.x, support.targetVillage.y) ||
+                        `Dorf`;
+
+                    bbCode += `Support von [b]${sourceVillageName}[/b] [coord]${support.sourceVillage.coords}[/coord] → [b]${targetVillageName}[/b] [coord]${support.targetVillage.x}|${support.targetVillage.y}[/coord]${timingInfo}\n`;
+                    bbCode += `Truppen: ${troopText}\n`;
+                    bbCode += `Senden: ${formatDateTime(support.sendTime)}\n`;
+                    bbCode += `Ankunft: ${formatDateTime(support.arrivalTime)} (zeitgleich mit Angriff)\n`;
+                    bbCode += `Entfernung: ${support.distance.toFixed(1)} Felder | Reisezeit: ${support.travelTimeMinutes} min\n\n`;
+                }
+            }
+
+            // Failed supports
+            if (failedSupports.length > 0) {
+                bbCode += '\n[b][color=red]Fehlgeschlagene Supports:[/color][/b]\n\n';
+
+                for (const support of failedSupports) {
+                    const targetVillageName = villageDataManager.getVillageNameByCoords(support.targetVillage.x, support.targetVillage.y) ||
+                        `Dorf`;
+
+                    bbCode += `[b]Ziel:[/b] ${targetVillageName} [coord]${support.targetVillage.x}|${support.targetVillage.y}[/coord]\n`;
+                    bbCode += `[b]Ankunftszeit:[/b] ${support.attackArrivalStr}\n`;
+                    bbCode += `[b]Fehler:[/b] ${support.error}\n\n`;
+                }
+            }
+
+            navigator.clipboard.writeText(bbCode).then(() => {
+                showDefSuccess('BB-Code wurde in die Zwischenablage kopiert!');
+            }).catch(() => {
+                showDefError('Fehler beim Kopieren in die Zwischenablage.');
+            });
+        }
+
+        function exportDefDSW() {
+            const validSupports = defCalculatedSupports.filter(s => !s.error);
+
+            if (validSupports.length === 0) {
+                showDefError('Keine Supports zum Exportieren vorhanden.');
+                return;
+            }
+
+            let dswContent = '';
+
+            for (const support of validSupports) {
+                const sourceCoords = support.sourceVillage.coords.split('|').map(Number);
+                const targetCoords = [support.targetVillage.x, support.targetVillage.y];
+
+                // Use villageDataManager to get real village IDs, fallback to generated IDs
+                const sourceId = villageDataManager.coordinatesToVillageId(sourceCoords[0], sourceCoords[1]) ||
+                               generateVillageId(sourceCoords[0], sourceCoords[1]);
+                const targetId = villageDataManager.coordinatesToVillageId(targetCoords[0], targetCoords[1]) ||
+                               generateVillageId(targetCoords[0], targetCoords[1]);
+
+                // Determine slowest unit type
+                let unitType = support.slowestUnit || 'heavy';
+
+                // Create troops string
+                const troops = {};
+                if (support.spears > 0) troops.spear = support.spears.toString();
+                if (support.swords > 0) troops.sword = support.swords.toString();
+                if (support.heavy > 0) troops.heavy = support.heavy.toString();
+                if (support.rams > 0) troops.ram = support.rams.toString();
+                if (support.catapults > 0) troops.catapult = support.catapults.toString();
+
+                const troopsString = assembleTroopsString(troops);
+                const arrivalTimestamp = support.arrivalTime.getTime();
+
+                // Build DSW command: sourceId&targetId&unitType&arrivalTimestamp&attackType&unused&sent&troops
+                const dswCommand = [
+                    sourceId,
+                    targetId,
+                    unitType,
+                    arrivalTimestamp,
+                    '0', // Support attack type
+                    'false', // unused
+                    'false', // sent
+                    troopsString
+                ].join('&');
+
+                dswContent += dswCommand + '\n';
+            }
+
+            // Try to copy to clipboard first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(dswContent).then(() => {
+                    showDefSuccess('DS Workbench Daten wurden in die Zwischenablage kopiert!');
+                }).catch(() => {
+                    downloadFile(dswContent, 'defense_support.dsw');
+                });
+            } else {
+                // Fallback: download file
+                downloadFile(dswContent, 'defense_support.dsw');
+            }
+        }
+
+        function displayDefenseBBCode(validSupports, failedSupports, container) {
+            let bbCode = '';
+
+            // Valid supports
+            if (validSupports.length > 0) {
+                bbCode += '[b]Tab Supports:[/b]\n\n';
+
+                for (const support of validSupports) {
+                    const sendTimeStr = formatDateTime(support.sendTime);
+                    const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' :
+                                      support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
+
+                    let troopText = `${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere`;
+                    if (support.rams > 0) {
+                        troopText += `, ${support.rams} Rammbock`;
+                    }
+                    if (support.catapults > 0) {
+                        troopText += `, ${support.catapults} Katapult`;
+                    }
+
+                    // Get village names
+                    const sourceVillageName = support.sourceVillage.name ||
+                        villageDataManager.getVillageNameByCoords(support.sourceVillage.x, support.sourceVillage.y) ||
+                        `Dorf`;
+                    const targetVillageName = villageDataManager.getVillageNameByCoords(support.targetVillage.x, support.targetVillage.y) ||
+                        `Dorf`;
+
+                    bbCode += `[b]Ziel:[/b] ${targetVillageName} [coord]${support.targetVillage.x}|${support.targetVillage.y}[/coord]${timingInfo}\n`;
+                    bbCode += `[b]Von:[/b] ${sourceVillageName} [coord]${support.sourceVillage.x}|${support.sourceVillage.y}[/coord]\n`;
+                    bbCode += `[b]Truppen:[/b] ${troopText}\n`;
+                    bbCode += `[b]Sendezeit:[/b] ${sendTimeStr}\n`;
+                    bbCode += `[b]Ankunftszeit:[/b] ${support.attackArrivalStr}\n`;
+                    bbCode += `[b]Entfernung:[/b] ${support.distance.toFixed(2)} Felder (${support.travelTimeMinutes} Minuten)\n`;
+                    bbCode += '\n';
+                }
+            }
+
+            // Failed supports
+            if (failedSupports.length > 0) {
+                bbCode += '\n[b][color=red]Fehlgeschlagene Supports:[/color][/b]\n\n';
+
+                for (const support of failedSupports) {
+                    const targetVillageName = villageDataManager.getVillageNameByCoords(support.targetVillage.x, support.targetVillage.y) ||
+                        `Dorf`;
+
+                    bbCode += `[b]Ziel:[/b] ${targetVillageName} [coord]${support.targetVillage.x}|${support.targetVillage.y}[/coord]\n`;
+                    bbCode += `[b]Ankunftszeit:[/b] ${support.attackArrivalStr}\n`;
+                    bbCode += `[b]Fehler:[/b] ${support.error}\n\n`;
+                }
+            }
+
+            const textArea = document.createElement('textarea');
+            textArea.value = bbCode;
+            textArea.style.width = '100%';
+            textArea.style.height = '400px';
+            textArea.style.marginTop = '15px';
+            textArea.style.fontFamily = 'monospace';
+            textArea.style.fontSize = '12px';
+            container.appendChild(textArea);
+
+            const copyButton = document.createElement('button');
+            copyButton.textContent = '📋 In Zwischenablage kopieren';
+            copyButton.style.marginTop = '10px';
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(bbCode).then(() => {
+                    showDefSuccess('In Zwischenablage kopiert!');
+                }).catch(() => {
+                    textArea.select();
+                    document.execCommand('copy');
+                    showDefSuccess('In Zwischenablage kopiert!');
+                });
+            };
+            container.appendChild(copyButton);
+        }
+
+        function displayDefenseDSW(validSupports, failedSupports, container) {
+            // DS Workbench format
+            let dswContent = '';
+
+            for (const support of validSupports) {
+                dswContent += `${support.sourceVillage.x}|${support.sourceVillage.y}\t`;
+                dswContent += `${support.targetVillage.x}|${support.targetVillage.y}\t`;
+                dswContent += `${support.spears}\t${support.swords}\t0\t0\t0\t0\t0\t${support.heavy}\t0\t0\t0\t`;
+                dswContent += `support\t`;
+                dswContent += `${formatDateTimeDSW(support.sendTime)}\t`;
+                dswContent += `${formatDateTimeDSW(support.arrivalTime)}\n`;
+            }
+
+            const textArea = document.createElement('textarea');
+            textArea.value = dswContent;
+            textArea.style.width = '100%';
+            textArea.style.height = '400px';
+            textArea.style.marginTop = '15px';
+            textArea.style.fontFamily = 'monospace';
+            textArea.style.fontSize = '12px';
+            container.appendChild(textArea);
+
+            const copyButton = document.createElement('button');
+            copyButton.textContent = '📋 In Zwischenablage kopieren';
+            copyButton.style.marginTop = '10px';
+            copyButton.style.marginRight = '10px';
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(dswContent).then(() => {
+                    showDefSuccess('In Zwischenablage kopiert!');
+                }).catch(() => {
+                    textArea.select();
+                    document.execCommand('copy');
+                    showDefSuccess('In Zwischenablage kopiert!');
+                });
+            };
+            container.appendChild(copyButton);
+
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = '💾 Als .dsw Datei herunterladen';
+            downloadButton.style.marginTop = '10px';
+            downloadButton.onclick = () => {
+                const blob = new Blob([dswContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'defense_support.dsw';
+                a.click();
+                URL.revokeObjectURL(url);
+                showDefSuccess('Datei wird heruntergeladen...');
+            };
+            container.appendChild(downloadButton);
+
+            // Show failed supports
+            if (failedSupports.length > 0) {
+                const failedDiv = document.createElement('div');
+                failedDiv.style.marginTop = '20px';
+                failedDiv.style.padding = '15px';
+                failedDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+                failedDiv.style.borderRadius = '8px';
+                failedDiv.style.color = '#ef4444';
+
+                let failedHTML = '<strong>Fehlgeschlagene Supports:</strong><br><br>';
+                for (const support of failedSupports) {
+                    failedHTML += `Ziel: ${support.targetVillage.x}|${support.targetVillage.y} - `;
+                    failedHTML += `Ankunft: ${support.attackArrivalStr} - `;
+                    failedHTML += `Fehler: ${support.error}<br>`;
+                }
+                failedDiv.innerHTML = failedHTML;
+                container.appendChild(failedDiv);
+            }
+        }
+
+        function formatDateTime(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function formatDateTimeDSW(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            const ms = String(date.getMilliseconds()).padStart(3, '0');
+            return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}.${ms}`;
+        }
+
+        function clearDefense() {
+            document.getElementById('sosInput').value = '';
+            document.getElementById('defTroopsInput').value = '';
+            document.getElementById('defResults').innerHTML = '';
+            defSOSData = [];
+            defAvailableTroops = [];
+
+            // Clear saved form data from localStorage
+            localStorage.removeItem('tw_defense_support_data');
+            console.log('Defense form data cleared from localStorage');
+        }
+
+        // LocalStorage functions for defense tool
+        function saveDefenseFormData() {
+            const formData = {
+                sosInput: document.getElementById('sosInput').value,
+                defTroopsInput: document.getElementById('defTroopsInput').value,
+                defWorldInput: document.getElementById('defWorldInput').value,
+                defMinTimeBefore: document.getElementById('defMinTimeBefore').value,
+                defSupportSpears: document.getElementById('defSupportSpears').value,
+                defSupportSwords: document.getElementById('defSupportSwords').value,
+                defSupportHeavy: document.getElementById('defSupportHeavy').value,
+                defTroopFormat: defTroopFormat,
+                defOutputFormat: document.querySelector('input[name="defOutputFormat"]:checked').value
+            };
+
+            try {
+                localStorage.setItem('tw_defense_support_data', JSON.stringify(formData));
+                console.log('Defense form data saved to localStorage');
+            } catch (error) {
+                console.warn('Failed to save defense form data to localStorage:', error);
+            }
+        }
+
+        function loadDefenseFormData() {
+            try {
+                const savedData = localStorage.getItem('tw_defense_support_data');
+                if (!savedData) return false;
+
+                const formData = JSON.parse(savedData);
+
+                // Restore input values
+                if (formData.sosInput) document.getElementById('sosInput').value = formData.sosInput;
+                if (formData.defTroopsInput) document.getElementById('defTroopsInput').value = formData.defTroopsInput;
+                if (formData.defWorldInput) document.getElementById('defWorldInput').value = formData.defWorldInput;
+                if (formData.defMinTimeBefore) document.getElementById('defMinTimeBefore').value = formData.defMinTimeBefore;
+                if (formData.defSupportSpears) document.getElementById('defSupportSpears').value = formData.defSupportSpears;
+                if (formData.defSupportSwords) document.getElementById('defSupportSwords').value = formData.defSupportSwords;
+                if (formData.defSupportHeavy) document.getElementById('defSupportHeavy').value = formData.defSupportHeavy;
+
+                // Restore format selections
+                if (formData.defTroopFormat) {
+                    defTroopFormat = formData.defTroopFormat;
+                    if (formData.defTroopFormat === 'standard') {
+                        document.getElementById('defStandardFormat').checked = true;
+                    } else {
+                        document.getElementById('defTribeFormat').checked = true;
+                    }
+                }
+
+                if (formData.defOutputFormat) {
+                    if (formData.defOutputFormat === 'bb') {
+                        document.getElementById('defBBOutput').checked = true;
+                    } else {
+                        document.getElementById('defDSWOutput').checked = true;
+                    }
+                }
+
+                console.log('Defense form data loaded from localStorage');
+                return true;
+            } catch (error) {
+                console.warn('Failed to load defense form data from localStorage:', error);
+                return false;
+            }
+        }
+
+        function showDefError(message) {
+            const resultsDiv = document.getElementById('defResults');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'container';
+            errorDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+            errorDiv.style.borderColor = '#ef4444';
+            errorDiv.style.color = '#ef4444';
+            errorDiv.innerHTML = `<strong>❌ Fehler:</strong> ${message}`;
+            resultsDiv.innerHTML = '';
+            resultsDiv.appendChild(errorDiv);
+        }
+
+        function showDefSuccess(message) {
+            const resultsDiv = document.getElementById('defResults');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'container';
+            successDiv.style.background = 'rgba(16, 185, 129, 0.1)';
+            successDiv.style.borderColor = '#10b981';
+            successDiv.style.color = '#10b981';
+            successDiv.innerHTML = `<strong>✓ Erfolg:</strong> ${message}`;
+            setTimeout(() => successDiv.remove(), 3000);
+            resultsDiv.insertBefore(successDiv, resultsDiv.firstChild);
+        }
+
+    </script>
+</body>
+</html>

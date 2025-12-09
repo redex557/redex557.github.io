@@ -611,14 +611,14 @@
                 <div class="container">
                     <div class="input-section">
                         <div class="input-group">
-                            <label for="sosInput">SOS-Daten (aus Stammesübersicht):</label>
-                            <textarea id="sosInput" placeholder="Fügen Sie hier die SOS-Daten aus der Stammesübersicht ein..."></textarea>
+                            <label for="sosInput">SOS-Daten:</label>
+                            <textarea id="sosInput" placeholder="Fügen Sie hier die SOS-Daten ein..."></textarea>
                         </div>
                         <div class="input-group">
                             <label for="defTroopsInput">Verfügbare Truppen:</label>
                             <div style="margin-bottom: 10px; display: flex; align-items: center; min-height: 28px;">
                                 <input type="radio" id="defStandardFormat" name="defTroopFormat" value="standard" checked onchange="toggleDefTroopFormat()">
-                                <label for="defStandardFormat" style="margin-right: 20px; font-weight: normal;">Standard Format</label>
+                                <label for="defStandardFormat" style="margin-right: 20px; font-weight: normal;">Standard Format (Truppenübersicht)</label>
                                 <input type="radio" id="defTribeFormat" name="defTroopFormat" value="tribe" onchange="toggleDefTroopFormat()">
                                 <label for="defTribeFormat" style="font-weight: normal;">Tribe Info Format</label>
                                 <input type="file" id="defTribeInfoFileInput" accept=".txt" style="display: none;" onchange="handleDefTribeInfoFile(event)">
@@ -637,7 +637,7 @@
                             <input type="text" id="defWorldInput" value="de230" placeholder="z.B. de230">
                         </div>
                         <div class="config-group">
-                            <label for="defMinTimeBefore">Min. Zeit vor Angriff (min):</label>
+                            <label for="defMinTimeBefore">Min. Reisezeit (min):</label>
                             <input type="number" id="defMinTimeBefore" value="5" min="0" placeholder="z.B. 5">
                         </div>
                         <div class="config-group">
@@ -685,12 +685,12 @@
                 <div class="container" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
                     <h2 style="color: #3b82f6; border-color: #3b82f6;">ℹ️ Anleitung</h2>
                     <p style="color: #cbd5e1; line-height: 1.6;">
-                        <strong>1. SOS-Daten:</strong> Kopieren Sie die SOS-Daten aus der Stammesübersicht. Das Tool erkennt automatisch angegriffene Dörfer und Ankunftszeiten.<br>
-                        <strong>2. Truppen:</strong> Fügen Sie Ihre verfügbaren Truppen ein (Standard- oder Tribe Info Format).<br>
-                        <strong>3. Konfiguration:</strong> Geben Sie an, wie viele Truppen pro Support gesendet werden sollen und wie viel Zeit vor dem Angriff mindestens sein muss.<br>
+                        <strong>1. SOS-Daten:</strong> Kopieren Sie die SOS-Daten. Das Tool erkennt automatisch angegriffene Dörfer und Ankunftszeiten.<br>
+                        <strong>2. Truppen:</strong> Fügen Sie Ihre verfügbaren Truppen ein (Standard- (Truppenübersicht -> Strg+C) oder Tribe Info Format).<br>
+                        <strong>3. Konfiguration:</strong> Geben Sie an, wie viele Truppen pro Support gesendet werden sollen und die minimale Reisezeit (Zeit zwischen Absenden und Eintreffen).<br>
                         <strong>4. Zeit-Optimierung:</strong> Das Tool fügt automatisch einen <strong>Rammbock</strong> oder <strong>Katapult</strong> zu Support-Truppen hinzu, um früher zu senden und mehr Zeitpuffer zu haben (optional).<br>
                         <strong>5. Berechnung:</strong> Das Tool generiert für jeden Angriff einen Support, der exakt zur gleichen Zeit wie der Angriff ankommt.<br><br>
-                        <strong>⏱️ Timing:</strong> Supports werden so berechnet, dass sie genau zur Ankunftszeit des Angriffs ankommen. Supports, die zu spät gesendet werden müssten, werden markiert.
+                        <strong>⏱️ Timing:</strong> Supports werden so berechnet, dass sie genau zur Ankunftszeit des Angriffs ankommen. Dörfer mit zu kurzer Reisezeit oder zu spätem Sendezeitpunkt werden übersprungen.
                     </p>
                 </div>
 
@@ -2999,7 +2999,6 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     const baseTravelTime = calculateTravelTime(distance, baseSlowestUnit);
                     let sendTime = new Date(attack.arrivalTime.getTime() - baseTravelTime * 60000);
                     let timeUntilSend = sendTime.getTime() - now.getTime();
-                    const minTimeBeforeMs = minTimeBefore * 60 * 1000;
 
                     console.log(`    Distance: ${distance.toFixed(2)} fields`);
                     console.log(`    Base slowest unit: ${baseSlowestUnit}`);
@@ -3007,9 +3006,18 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     console.log(`    Base send time: ${formatDateTime(sendTime)}`);
                     console.log(`    Time until send: ${Math.round(timeUntilSend / 60000)} minutes`);
 
-                    // Check if we can still send in time with base config
-                    if (timeUntilSend < minTimeBeforeMs) {
-                        const reason = `Too late to send (send in ${Math.round(timeUntilSend / 60000)} min, need ${minTimeBefore} min buffer)`;
+                    // Check if travel time meets minimum requirement
+                    // Travel time must be at least minTimeBefore minutes
+                    if (baseTravelTime < minTimeBefore) {
+                        const reason = `Travel time too short (${baseTravelTime} min, need at least ${minTimeBefore} min)`;
+                        console.log(`    ❌ ${reason}`);
+                        rejectionReasons.push(`${village.coords}: ${reason}`);
+                        continue;
+                    }
+
+                    // Check if we can still send now (not too late)
+                    if (timeUntilSend < 0) {
+                        const reason = `Too late to send (needed to send ${Math.round(-timeUntilSend / 60000)} min ago)`;
                         console.log(`    ❌ ${reason}`);
                         rejectionReasons.push(`${village.coords}: ${reason}`);
                         continue;
@@ -3029,8 +3037,10 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
 
                             console.log(`      Ram option: travel=${travelTimeWithRam}min, send=${formatDateTime(sendTimeWithRam)}`);
 
-                            // If ram gives earlier send time (more buffer, better for defense), use it
-                            if (sendTimeWithRam < sendTime && timeUntilSendWithRam >= minTimeBeforeMs) {
+                            // Check: ram travel time must meet minimum AND we can still send in time AND it gives earlier send time
+                            if (travelTimeWithRam >= minTimeBefore &&
+                                timeUntilSendWithRam >= 0 &&
+                                sendTimeWithRam < sendTime) {
                                 console.log(`      ✅ Ram improves timing (earlier send)!`);
                                 bestOption.rams = 1;
                                 bestOption.slowestUnit = 'ram';
@@ -3047,8 +3057,10 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
 
                             console.log(`      Catapult option: travel=${travelTimeWithCatapult}min, send=${formatDateTime(sendTimeWithCatapult)}`);
 
-                            // If catapult gives earlier send time (more buffer, better for defense), use it
-                            if (sendTimeWithCatapult < sendTime && timeUntilSendWithCatapult >= minTimeBeforeMs) {
+                            // Check: catapult travel time must meet minimum AND we can still send in time AND it gives earlier send time
+                            if (travelTimeWithCatapult >= minTimeBefore &&
+                                timeUntilSendWithCatapult >= 0 &&
+                                sendTimeWithCatapult < sendTime) {
                                 console.log(`      ✅ Catapult improves timing (earlier send)!`);
                                 bestOption.catapults = 1;
                                 bestOption.slowestUnit = 'catapult';

@@ -433,6 +433,12 @@
             </div>
             <ul class="tab-list">
                 <li class="tab-item">
+                    <button class="tab-button" onclick="switchPage('setup')">
+                        <span>⚙️</span>
+                        <span>Setup</span>
+                    </button>
+                </li>
+                <li class="tab-item">
                     <button class="tab-button active" onclick="switchPage('support-planner')">
                         <span>🏰</span>
                         <span>Support Planner</span>
@@ -454,6 +460,61 @@
         </aside>
 
         <main class="main-content">
+            <div id="setup" class="page">
+                <h1>⚙️ Setup</h1>
+
+                <div class="container">
+                    <h2>🌍 Welteinstellungen</h2>
+                    <div class="config-section">
+                        <div class="config-group">
+                            <label for="worldInput">Welt:</label>
+                            <input type="text" id="worldInput" value="de230" placeholder="z.B. de230">
+                            <button onclick="loadVillageData()" style="margin-top: 10px; padding: 8px 16px; font-size: 12px;">Dorfdata laden</button>
+                            <button onclick="showManualInput()" style="margin-top: 5px; padding: 6px 12px; font-size: 11px; background: linear-gradient(135deg, #6366f1, #4f46e5);">Manuell eingeben</button>
+                        </div>
+                        <div class="config-group" style="grid-column: span 2;">
+                            <label>⚔️ Weltspezifische Einheiten:</label>
+                            <p style="color: #94a3b8; font-size: 11px; margin: 4px 0 10px;">Aktiviere Einheitentypen die auf dieser Welt verfügbar sind. Beeinflusst die Spaltenauswertung im Standard-Format.</p>
+                            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                                    <input type="checkbox" id="hasArchers" onchange="updateWorldConfig()" style="cursor: pointer; width: 16px; height: 16px;">
+                                    Bogenschützen (Bogenschütze + Berittener Bogenschütze)
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                                    <input type="checkbox" id="hasMiliz" onchange="updateWorldConfig()" style="cursor: pointer; width: 16px; height: 16px;">
+                                    Miliz
+                                </label>
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                                    <input type="checkbox" id="hasPaladin" onchange="updateWorldConfig()" style="cursor: pointer; width: 16px; height: 16px;">
+                                    Paladin
+                                </label>
+                            </div>
+                        </div>
+                        <div class="config-group" style="grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 4px;">
+                            <label>⏱️ Zeitpräzision:</label>
+                            <p style="color: #94a3b8; font-size: 11px; margin: 4px 0 10px;">Aktiviere Millisekunden wenn die Welt ms-genaue Zeitstempel verwendet. Der Versatz verschiebt die berechnete Sendezeit um den angegebenen Wert.</p>
+                            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+                                <label style="font-weight: normal; display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                                    <input type="checkbox" id="hasMilliseconds" onchange="updateWorldConfig()" style="cursor: pointer; width: 16px; height: 16px;">
+                                    Millisekunden-genau
+                                </label>
+                                <div id="msOffsetConfig" style="display: none; align-items: center; gap: 8px;">
+                                    <label for="msOffset" style="font-weight: normal; white-space: nowrap;">Versatz (ms):</label>
+                                    <input type="number" id="msOffset" value="0" step="1" onchange="updateWorldConfig()" style="width: 90px; padding: 4px 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="villageDataStatus" class="container" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
+                    <h2 style="color: #3b82f6; border-color: #3b82f6;">📊 Dorfdata Status</h2>
+                    <p id="villageDataInfo" style="color: #cbd5e1; line-height: 1.6;">
+                        Noch keine Dorfdata geladen. Klicken Sie auf "Dorfdata laden" um die aktuellen Dorfkoordinaten zu laden.
+                    </p>
+                </div>
+            </div>
+
             <div id="support-planner" class="page active">
                 <h1>🏰 Die Stämme - Support Planner</h1>
 
@@ -488,12 +549,6 @@
 
                     <div class="config-section">
                         <div class="config-group">
-                            <label for="worldInput">Welt:</label>
-                            <input type="text" id="worldInput" value="de230" placeholder="z.B. de230">
-                            <button onclick="loadVillageData()" style="margin-top: 10px; padding: 8px 16px; font-size: 12px;">Dorfdata laden</button>
-                            <button onclick="showManualInput()" style="margin-top: 5px; padding: 6px 12px; font-size: 11px; background: linear-gradient(135deg, #6366f1, #4f46e5);">Manuell eingeben</button>
-                        </div>
-                        <div class="config-group">
                             <label for="totalSpears">Gesamt Speerkämpfer:</label>
                             <input type="number" id="totalSpears" value="1000" min="0">
                         </div>
@@ -504,6 +559,14 @@
                         <div class="config-group">
                             <label for="totalHeavy">Gesamt Schwere Kavalerie:</label>
                             <input type="number" id="totalHeavy" value="500" min="0">
+                        </div>
+                        <div class="config-group" id="totalArchersConfig" style="display: none;">
+                            <label for="totalArchers">Gesamt Bogenschützen:</label>
+                            <input type="number" id="totalArchers" value="0" min="0">
+                        </div>
+                        <div class="config-group" id="totalMarchersConfig" style="display: none;">
+                            <label for="totalMarchers">Gesamt Berittene Bogenschützen:</label>
+                            <input type="number" id="totalMarchers" value="0" min="0">
                         </div>
                         <div class="config-group">
                             <label for="maxDistance">Max. Entfernung:</label>
@@ -553,31 +616,6 @@
                         <button onclick="clearAll()">Alles zurücksetzen</button>
                     </div>
 
-                    <!-- Manual input modal (hidden by default) -->
-                    <div id="manualInputModal" onclick="hideManualInput()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-                        <div onclick="event.stopPropagation();" style="background: rgba(30, 41, 59, 0.95); padding: 30px; border-radius: 16px; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto; backdrop-filter: blur(10px); border: 1px solid rgba(71, 85, 105, 0.3);">
-                            <h3 style="color: #f59e0b; margin-bottom: 20px;">📝 Manuelle Dorfdata-Eingabe</h3>
-                            <p id="manualInstructions" style="color: #cbd5e1; margin-bottom: 15px; line-height: 1.5;">
-                                <strong>Anleitung:</strong><br>
-                                1. Öffnen Sie <strong>https://de230.die-staemme.de/map/village.txt</strong> in einem neuen Tab<br>
-                                2. Kopieren Sie den kompletten Inhalt (Strg+A, dann Strg+C)<br>
-                                3. Fügen Sie ihn in das Textfeld unten ein<br>
-                                4. Klicken Sie auf "Daten laden"
-                            </p>
-                            <textarea id="manualVillageData" placeholder="Fügen Sie hier die CSV-Daten ein..." style="width: 100%; height: 200px; font-family: monospace; font-size: 11px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(71, 85, 105, 0.4); border-radius: 8px; color: #e2e8f0; padding: 10px;"></textarea>
-                            <div style="margin-top: 15px; text-align: center;">
-                                <button onclick="loadManualVillageData()" style="margin-right: 10px;">Daten laden</button>
-                                <button onclick="hideManualInput()" style="background: linear-gradient(135deg, #6b7280, #4b5563);">Abbrechen</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="villageDataStatus" class="container" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
-                    <h2 style="color: #3b82f6; border-color: #3b82f6;">📊 Dorfdata Status</h2>
-                    <p id="villageDataInfo" style="color: #cbd5e1; line-height: 1.6;">
-                        Noch keine Dorfdata geladen. Klicken Sie auf "Dorfdata laden" um die aktuellen Dorfkoordinaten zu laden.
-                    </p>
                 </div>
 
                 <div class="container" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
@@ -651,6 +689,14 @@
                         <div class="config-group">
                             <label for="defSupportHeavy">Schwere Kavallerie pro Support:</label>
                             <input type="number" id="defSupportHeavy" value="50" min="0">
+                        </div>
+                        <div class="config-group" id="defSupportArchersConfig" style="display: none;">
+                            <label for="defSupportArchers">Bogenschützen pro Support:</label>
+                            <input type="number" id="defSupportArchers" value="0" min="0">
+                        </div>
+                        <div class="config-group" id="defSupportMarchersConfig" style="display: none;">
+                            <label for="defSupportMarchers">Berittene Bogenschützen pro Support:</label>
+                            <input type="number" id="defSupportMarchers" value="0" min="0">
                         </div>
                         <div class="config-group">
                             <label>
@@ -1166,14 +1212,15 @@
         let troopData = [];
         let currentInputFormat = 'bb'; // 'bb' or 'dsw'
         let currentTroopFormat = 'standard'; // 'standard' or 'tribe'
+        let worldConfig = { hasArchers: false, hasMiliz: false, hasPaladin: false, hasMilliseconds: false, msOffset: 0 };
 
         function parseDateTime(dateTimeStr) {
-            // Parse format: 2025-07-07 07:47:21:0
+            // Parse format: 2025-07-07 07:47:21:0 (or :mmm for ms worlds)
             // Times are assumed to be in Europe/Berlin timezone
             const match = dateTimeStr.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}):(\d+)/);
             if (!match) return null;
 
-            const [, year, month, day, hour, minute, second] = match;
+            const [, year, month, day, hour, minute, second, msRaw] = match;
             // Create date string in ISO format for Europe/Berlin timezone
             const dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${second.padStart(2, '0')}`;
 
@@ -1182,10 +1229,14 @@
             // Calculate timezone offset for Europe/Berlin
             const berlinDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
             const localDate = new Date(date.toLocaleString('en-US'));
-            const offset = localDate.getTime() - berlinDate.getTime();
+            const tzOffset = localDate.getTime() - berlinDate.getTime();
 
-            // Return date adjusted to represent Berlin time in UTC
-            return new Date(date.getTime() - offset);
+            // Return date adjusted to represent Berlin time in UTC, with ms if enabled
+            const result = new Date(date.getTime() - tzOffset);
+            if (worldConfig.hasMilliseconds) {
+                return new Date(result.getTime() + (parseInt(msRaw) || 0));
+            }
+            return result;
         }
 
         function formatDateTime(date) {
@@ -1202,8 +1253,8 @@
             };
 
             const parts = new Intl.DateTimeFormat('sv-SE', options).format(date);
-            // Convert from "YYYY-MM-DD HH:MM:SS" to "YYYY-MM-DD HH:MM:SS:0"
-            return parts.replace(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/, '$1-$2-$3 $4:$5:$6:0');
+            const ms = worldConfig.hasMilliseconds ? String(date.getMilliseconds()).padStart(3, '0') : '0';
+            return parts.replace(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/, `$1-$2-$3 $4:$5:$6:${ms}`);
         }
 
         function calculateDistance(coord1, coord2) {
@@ -1214,6 +1265,14 @@
 
         function calculateTravelTime(distance, unitType) {
             return Math.ceil(distance * UNIT_SPEEDS[unitType]);
+        }
+
+        // Returns travel duration in ms. Exact float when hasMilliseconds, ceiled-minutes*60000 otherwise.
+        function travelDurationMs(distance, unitType) {
+            if (worldConfig.hasMilliseconds) {
+                return distance * (UNIT_SPEEDS[unitType] || 18) * 60000;
+            }
+            return Math.ceil(distance * (UNIT_SPEEDS[unitType] || 18)) * 60000;
         }
 
         function parsePlan(planText) {
@@ -1524,24 +1583,33 @@
             const troops = [];
             const lines = troopsText.split('\n');
 
+            // Column offsets depend on world type:
+            // Without archers: spy=[5] light=[6] heavy=[7] ram=[8] cat=[9] noble=[10]
+            // With archers:    archer=[5] spy=[6] light=[7] marcher=[8] heavy=[9] ram=[10] cat=[11] noble=[12]
+            const a = worldConfig.hasArchers ? 1 : 0; // shifts spy and light (archer inserted before spy)
+            const b = worldConfig.hasArchers ? 2 : 0; // shifts heavy+ (archer + marcher inserted)
+            const minLength = worldConfig.hasArchers ? 14 : 12; // noble+Befehle must exist
+
             for (const line of lines) {
                 if (line.includes('eigene') && line.includes('Befehle')) {
                     const parts = line.split('\t');
-                    if (parts.length >= 11) {
+                    if (parts.length >= minLength) {
                         const villageName = parts[0].trim();
                         const coordMatch = villageName.match(/\((\d+\|\d+)\)/);
 
                         if (coordMatch) {
                             const coords = coordMatch[1];
-                            const spears = parseInt(parts[2]) || 0;      // Speerkämpfer
-                            const swords = parseInt(parts[3]) || 0;      // Schwertkämpfer
-                            const axes = parseInt(parts[4]) || 0;        // Axtkämpfer (not used)
-                            const spies = parseInt(parts[5]) || 0;       // Späher
-                            const light = parseInt(parts[6]) || 0;       // Leichte-Kavallerie
-                            const heavy = parseInt(parts[7]) || 0;       // Schwere-Kavallerie
-                            const rams = parseInt(parts[8]) || 0;        // Rammbock
-                            const catapults = parseInt(parts[9]) || 0;   // Katapult
-                            const nobles = parseInt(parts[10]) || 0;     // Adelsgeschlecht
+                            const spears = parseInt(parts[2]) || 0;          // Speerkämpfer
+                            const swords = parseInt(parts[3]) || 0;          // Schwertkämpfer
+                            const axes = parseInt(parts[4]) || 0;            // Axtkämpfer (not used)
+                            const archers = worldConfig.hasArchers ? (parseInt(parts[5]) || 0) : 0;    // Bogenschütze
+                            const spies = parseInt(parts[5 + a]) || 0;       // Späher
+                            const light = parseInt(parts[6 + a]) || 0;       // Leichte Kavallerie
+                            const marchers = worldConfig.hasArchers ? (parseInt(parts[8]) || 0) : 0;   // Berittener
+                            const heavy = parseInt(parts[7 + b]) || 0;       // Schwere Kavallerie
+                            const rams = parseInt(parts[8 + b]) || 0;        // Rammbock
+                            const catapults = parseInt(parts[9 + b]) || 0;   // Katapult
+                            const nobles = parseInt(parts[10 + b]) || 0;     // Adelsgeschlecht
 
                             troops.push({
                                 name: villageName,
@@ -1549,6 +1617,8 @@
                                 spears: spears,
                                 swords: swords,
                                 heavy: heavy,
+                                archers: archers,
+                                marchers: marchers,
                                 spies: spies,
                                 light: light,
                                 rams: rams,
@@ -1689,7 +1759,8 @@
                 if (!selectedUnitType) continue;
 
                 const travelTime = calculateTravelTime(distance, selectedUnitType);
-                const sendTime = new Date(requiredArrivalTime.getTime() - travelTime * 60000);
+                const msOff = worldConfig.hasMilliseconds ? worldConfig.msOffset : 0;
+                const sendTime = new Date(requiredArrivalTime.getTime() - travelDurationMs(distance, selectedUnitType) + msOff);
 
                 // Only add if send time is after nobleman start time and respects max time difference
                 if (sendTime > attack.startTime) {
@@ -1767,12 +1838,14 @@
                 const spearsToSend = Math.min(config.totalSpears, village.spears);
                 const swordsToSend = Math.min(config.totalSwords, village.swords);
                 const heavyToSend = Math.min(config.totalHeavy, village.heavy);
-                
-                if (spearsToSend > 0 || swordsToSend > 0 || heavyToSend > 0) {
+                const archersToSend = worldConfig.hasArchers ? Math.min(config.totalArchers || 0, village.archers || 0) : 0;
+                const marchersToSend = worldConfig.hasArchers ? Math.min(config.totalMarchers || 0, village.marchers || 0) : 0;
+
+                if (spearsToSend > 0 || swordsToSend > 0 || heavyToSend > 0 || archersToSend > 0 || marchersToSend > 0) {
                     // Find the actual slowest unit by comparing speeds of units we're actually sending
                     let slowestUnit = null;
                     let slowestSpeed = 0;
-                    
+
                     if (spearsToSend > 0) {
                         if (!slowestUnit || UNIT_SPEEDS.spear > slowestSpeed) {
                             slowestUnit = 'spear';
@@ -1791,15 +1864,30 @@
                             slowestSpeed = UNIT_SPEEDS.heavy;
                         }
                     }
-                    
+                    if (archersToSend > 0) {
+                        if (!slowestUnit || UNIT_SPEEDS.archer > slowestSpeed) {
+                            slowestUnit = 'archer';
+                            slowestSpeed = UNIT_SPEEDS.archer;
+                        }
+                    }
+                    if (marchersToSend > 0) {
+                        if (!slowestUnit || UNIT_SPEEDS.marcher > slowestSpeed) {
+                            slowestUnit = 'marcher';
+                            slowestSpeed = UNIT_SPEEDS.marcher;
+                        }
+                    }
+
                     const travelTimeNormal = calculateTravelTime(distance, slowestUnit);
-                    const sendTimeNormal = new Date(requiredArrivalTime.getTime() - travelTimeNormal * 60000);
-                    
+                    const _msOff = worldConfig.hasMilliseconds ? worldConfig.msOffset : 0;
+                    const sendTimeNormal = new Date(requiredArrivalTime.getTime() - travelDurationMs(distance, slowestUnit) + _msOff);
+
                     // Check if adding ram/catapult would improve timing
                     let bestOption = {
                         spears: spearsToSend,
                         swords: swordsToSend,
                         heavy: heavyToSend,
+                        archers: archersToSend,
+                        marchers: marchersToSend,
                         rams: 0,
                         catapults: 0,
                         sendTime: sendTimeNormal,
@@ -1814,7 +1902,7 @@
                         // Try adding a ram if available
                         if (village.rams > 0) {
                             const travelTimeWithRam = calculateTravelTime(distance, 'ram');
-                            const sendTimeWithRam = new Date(requiredArrivalTime.getTime() - travelTimeWithRam * 60000);
+                            const sendTimeWithRam = new Date(requiredArrivalTime.getTime() - travelDurationMs(distance, 'ram') + _msOff);
                             
                             if (sendTimeWithRam > attack.startTime) {
                                 const timeDiffWithRam = sendTimeWithRam.getTime() - attack.startTime.getTime();
@@ -1838,7 +1926,7 @@
                         // Try adding a catapult if available and no ram was better
                         if (village.catapults > 0 && bestOption.rams === 0) {
                             const travelTimeWithCatapult = calculateTravelTime(distance, 'catapult');
-                            const sendTimeWithCatapult = new Date(requiredArrivalTime.getTime() - travelTimeWithCatapult * 60000);
+                            const sendTimeWithCatapult = new Date(requiredArrivalTime.getTime() - travelDurationMs(distance, 'catapult') + _msOff);
                             
                             if (sendTimeWithCatapult > attack.startTime) {
                                 const timeDiffWithCatapult = sendTimeWithCatapult.getTime() - attack.startTime.getTime();
@@ -1870,6 +1958,8 @@
                                 spears: bestOption.spears,
                                 swords: bestOption.swords,
                                 heavy: bestOption.heavy,
+                                archers: bestOption.archers,
+                                marchers: bestOption.marchers,
                                 rams: bestOption.rams,
                                 catapults: bestOption.catapults,
                                 sendTime: bestOption.sendTime,
@@ -1892,17 +1982,22 @@
             let remainingSpears = config.totalSpears;
             let remainingSwords = config.totalSwords;
             let remainingHeavy = config.totalHeavy;
-            
+            let remainingArchers = worldConfig.hasArchers ? (config.totalArchers || 0) : 0;
+            let remainingMarchers = worldConfig.hasArchers ? (config.totalMarchers || 0) : 0;
+            const hasArcherBudget = remainingArchers > 0 || remainingMarchers > 0;
+
             for (const support of potentialSupports) {
-                if (remainingSpears <= 0 && remainingSwords <= 0 && remainingHeavy <= 0) {
-                    break;
-                }
-                
+                const anyRemaining = remainingSpears > 0 || remainingSwords > 0 || remainingHeavy > 0 ||
+                    (hasArcherBudget && (remainingArchers > 0 || remainingMarchers > 0));
+                if (!anyRemaining) break;
+
                 const spearsToSend = Math.min(remainingSpears, support.spears);
                 const swordsToSend = Math.min(remainingSwords, support.swords);
                 const heavyToSend = Math.min(remainingHeavy, support.heavy);
-                
-                if (spearsToSend > 0 || swordsToSend > 0 || heavyToSend > 0) {
+                const archersToSend = Math.min(remainingArchers, support.archers || 0);
+                const marchersToSend = Math.min(remainingMarchers, support.marchers || 0);
+
+                if (spearsToSend > 0 || swordsToSend > 0 || heavyToSend > 0 || archersToSend > 0 || marchersToSend > 0) {
                     supportPlans.push({
                         village: support.village,
                         coords: support.coords,
@@ -1910,6 +2005,8 @@
                         spears: spearsToSend,
                         swords: swordsToSend,
                         heavy: heavyToSend,
+                        archers: archersToSend,
+                        marchers: marchersToSend,
                         rams: support.rams,
                         catapults: support.catapults,
                         sendTime: support.sendTime,
@@ -1919,10 +2016,12 @@
                         slowestUnit: support.slowestUnit,
                         timeDiffFromNobleman: support.timeDiffFromNobleman
                     });
-                    
+
                     remainingSpears -= spearsToSend;
                     remainingSwords -= swordsToSend;
                     remainingHeavy -= heavyToSend;
+                    remainingArchers -= archersToSend;
+                    remainingMarchers -= marchersToSend;
                 }
             }
             
@@ -1962,6 +2061,8 @@
                     totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
                     totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
                     totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    totalArchers: parseInt(document.getElementById('totalArchers').value) || 0,
+                    totalMarchers: parseInt(document.getElementById('totalMarchers').value) || 0,
                     maxDistance: parseInt(document.getElementById('maxDistance').value) || 30,
                     maxTimeDiff: parseInt(document.getElementById('maxTimeDiff').value) || 999999,
                     fakeSupports: parseInt(document.getElementById('fakeSupports').value) || 0,
@@ -2012,10 +2113,12 @@
                             const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' : 
                                               support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
                             
+                            const archerTroopInfo = (support.archers > 0 ? `, ${support.archers} Bogenschützen` : '') +
+                                                   (support.marchers > 0 ? `, ${support.marchers} Berittene Bogenschützen` : '');
                             resultHtml += `
                                 <div class="support-item">
                                     <strong>${support.village}</strong> (${support.coords})<br>
-                                    Truppen: ${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavalerie${timingInfo}<br>
+                                    Truppen: ${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavalerie${archerTroopInfo}${timingInfo}<br>
                                     <strong>Senden:</strong> ${formatDateTime(support.sendTime)} (+${timeDiffFromNobleman} min nach Adel-Start)<br>
                                     <strong>Ankunft:</strong> ${formatDateTime(support.arrivalTime)} (gleichzeitig mit Adel)
                                     <div class="timing-info">
@@ -2074,7 +2177,7 @@
 
                 // Statistics
                 const totalTroopsSent = allSupportPlans.reduce((sum, support) =>
-                    sum + support.spears + support.swords + support.heavy + support.rams + support.catapults, 0);
+                    sum + support.spears + support.swords + support.heavy + (support.archers || 0) + (support.marchers || 0) + support.rams + support.catapults, 0);
 
                 resultHtml += `
                     <div class="stats">
@@ -2135,6 +2238,8 @@
                     totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
                     totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
                     totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    totalArchers: parseInt(document.getElementById('totalArchers').value) || 0,
+                    totalMarchers: parseInt(document.getElementById('totalMarchers').value) || 0,
                     maxDistance: parseInt(document.getElementById('maxDistance').value) || 30,
                     maxTimeDiff: parseInt(document.getElementById('maxTimeDiff').value) || 999999,
                     fakeSupports: parseInt(document.getElementById('fakeSupports').value) || 0,
@@ -2147,9 +2252,11 @@
                     const timeDiffFromNobleman = Math.round(support.timeDiffFromNobleman / 60000);
                     const timingInfo = support.rams > 0 ? ' (+ 1 Rammbock für optimales Timing)' :
                                       support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
+                    const archerBBInfo = (support.archers > 0 ? `, ${support.archers} Bogenschützen` : '') +
+                                        (support.marchers > 0 ? `, ${support.marchers} Berittene Bogenschützen` : '');
 
                     bbCode += `Support von [coord]${support.coords}[/coord] → [coord]${attack.target}[/coord]\n`;
-                    bbCode += `Truppen: ${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavalerie${timingInfo}\n`;
+                    bbCode += `Truppen: ${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavalerie${archerBBInfo}${timingInfo}\n`;
                     bbCode += `Senden: ${formatDateTime(support.sendTime)} (+${timeDiffFromNobleman} min nach Adel-Start)\n`;
                     bbCode += `Ankunft: ${formatDateTime(support.arrivalTime)} (gleichzeitig mit Adel)\n\n`;
                 }
@@ -2200,6 +2307,8 @@
                     totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
                     totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
                     totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    totalArchers: parseInt(document.getElementById('totalArchers').value) || 0,
+                    totalMarchers: parseInt(document.getElementById('totalMarchers').value) || 0,
                     maxDistance: parseInt(document.getElementById('maxDistance').value) || 30,
                     maxTimeDiff: parseInt(document.getElementById('maxTimeDiff').value) || 999999,
                     fakeSupports: parseInt(document.getElementById('fakeSupports').value) || 0,
@@ -2230,7 +2339,9 @@
                     const troops = {};
                     if (support.spears > 0) troops.spear = support.spears.toString();
                     if (support.swords > 0) troops.sword = support.swords.toString();
+                    if (support.archers > 0) troops.archer = support.archers.toString();
                     if (support.heavy > 0) troops.heavy = support.heavy.toString();
+                    if (support.marchers > 0) troops.marcher = support.marchers.toString();
                     if (support.rams > 0) troops.ram = support.rams.toString();
                     if (support.catapults > 0) troops.catapult = support.catapults.toString();
 
@@ -2320,18 +2431,20 @@
         }
 
         function exportCSV() {
-            let csv = 'Angreifer,Quelle,Ziel-Spieler,Ziel,Speere,Schwerter,Schwere Kavalerie,Rammbock,Katapult,Sendezeit,Ankunftszeit,Entfernung,Langsamste Einheit\n';
-            
+            let csv = 'Angreifer,Quelle,Ziel-Spieler,Ziel,Speere,Schwerter,Schwere Kavalerie,Bogenschützen,Berittene Bogenschützen,Rammbock,Katapult,Sendezeit,Ankunftszeit,Entfernung,Langsamste Einheit\n';
+
             for (const attack of planData) {
                 const supportPlans = findOptimalSupport(attack, troopData, {
                     totalSpears: parseInt(document.getElementById('totalSpears').value) || 0,
                     totalSwords: parseInt(document.getElementById('totalSwords').value) || 0,
                     totalHeavy: parseInt(document.getElementById('totalHeavy').value) || 0,
+                    totalArchers: parseInt(document.getElementById('totalArchers').value) || 0,
+                    totalMarchers: parseInt(document.getElementById('totalMarchers').value) || 0,
                     maxDistance: parseInt(document.getElementById('maxDistance').value) || 30
                 });
-                
+
                 for (const support of supportPlans) {
-                    csv += `${attack.sourcePlayer},${support.coords},${attack.targetPlayer},${attack.target},${support.spears},${support.swords},${support.heavy},${support.rams},${support.catapults},${formatDateTime(support.sendTime)},${formatDateTime(support.arrivalTime)},${support.distance.toFixed(1)},${support.slowestUnit}\n`;
+                    csv += `${attack.sourcePlayer},${support.coords},${attack.targetPlayer},${attack.target},${support.spears},${support.swords},${support.heavy},${support.archers || 0},${support.marchers || 0},${support.rams},${support.catapults},${formatDateTime(support.sendTime)},${formatDateTime(support.arrivalTime)},${support.distance.toFixed(1)},${support.slowestUnit}\n`;
                 }
             }
             
@@ -2360,12 +2473,19 @@
                 totalSpears: document.getElementById('totalSpears').value,
                 totalSwords: document.getElementById('totalSwords').value,
                 totalHeavy: document.getElementById('totalHeavy').value,
+                totalArchers: document.getElementById('totalArchers').value,
+                totalMarchers: document.getElementById('totalMarchers').value,
                 maxDistance: document.getElementById('maxDistance').value,
                 maxTimeDiff: document.getElementById('maxTimeDiff').value,
                 fakeSupports: document.getElementById('fakeSupports').value,
                 planFormat: currentInputFormat,
                 troopFormat: currentTroopFormat,
-                fakeUnitTypes: Array.from(document.querySelectorAll('.fakeUnitCheckbox:checked')).map(cb => cb.value)
+                fakeUnitTypes: Array.from(document.querySelectorAll('.fakeUnitCheckbox:checked')).map(cb => cb.value),
+                hasArchers: worldConfig.hasArchers,
+                hasMiliz: worldConfig.hasMiliz,
+                hasPaladin: worldConfig.hasPaladin,
+                hasMilliseconds: worldConfig.hasMilliseconds,
+                msOffset: worldConfig.msOffset
             };
 
             try {
@@ -2390,6 +2510,8 @@
                 if (formData.totalSpears) document.getElementById('totalSpears').value = formData.totalSpears;
                 if (formData.totalSwords) document.getElementById('totalSwords').value = formData.totalSwords;
                 if (formData.totalHeavy) document.getElementById('totalHeavy').value = formData.totalHeavy;
+                if (formData.totalArchers !== undefined) document.getElementById('totalArchers').value = formData.totalArchers;
+                if (formData.totalMarchers !== undefined) document.getElementById('totalMarchers').value = formData.totalMarchers;
                 if (formData.maxDistance) document.getElementById('maxDistance').value = formData.maxDistance;
                 if (formData.maxTimeDiff) document.getElementById('maxTimeDiff').value = formData.maxTimeDiff;
                 if (formData.fakeSupports) document.getElementById('fakeSupports').value = formData.fakeSupports;
@@ -2424,6 +2546,29 @@
                     });
                 }
 
+                // Restore world-specific troop config
+                if (formData.hasArchers !== undefined) {
+                    worldConfig.hasArchers = formData.hasArchers;
+                    document.getElementById('hasArchers').checked = formData.hasArchers;
+                }
+                if (formData.hasMiliz !== undefined) {
+                    worldConfig.hasMiliz = formData.hasMiliz;
+                    document.getElementById('hasMiliz').checked = formData.hasMiliz;
+                }
+                if (formData.hasPaladin !== undefined) {
+                    worldConfig.hasPaladin = formData.hasPaladin;
+                    document.getElementById('hasPaladin').checked = formData.hasPaladin;
+                }
+                if (formData.hasMilliseconds !== undefined) {
+                    worldConfig.hasMilliseconds = formData.hasMilliseconds;
+                    document.getElementById('hasMilliseconds').checked = formData.hasMilliseconds;
+                }
+                if (formData.msOffset !== undefined) {
+                    worldConfig.msOffset = formData.msOffset;
+                    document.getElementById('msOffset').value = formData.msOffset;
+                }
+                updateWorldConfigUI();
+
                 console.log('Form data loaded from localStorage');
                 return true;
             } catch (error) {
@@ -2456,6 +2601,25 @@
 
             // Clear results when format changes
             document.getElementById('results').innerHTML = '';
+        }
+
+        function updateWorldConfig() {
+            worldConfig.hasArchers = document.getElementById('hasArchers').checked;
+            worldConfig.hasMiliz = document.getElementById('hasMiliz').checked;
+            worldConfig.hasPaladin = document.getElementById('hasPaladin').checked;
+            worldConfig.hasMilliseconds = document.getElementById('hasMilliseconds').checked;
+            worldConfig.msOffset = parseInt(document.getElementById('msOffset').value) || 0;
+            updateWorldConfigUI();
+            saveFormData();
+        }
+
+        function updateWorldConfigUI() {
+            const show = worldConfig.hasArchers ? '' : 'none';
+            document.getElementById('totalArchersConfig').style.display = show;
+            document.getElementById('totalMarchersConfig').style.display = show;
+            document.getElementById('defSupportArchersConfig').style.display = show;
+            document.getElementById('defSupportMarchersConfig').style.display = show;
+            document.getElementById('msOffsetConfig').style.display = worldConfig.hasMilliseconds ? 'flex' : 'none';
         }
 
         function toggleTroopFormat() {
@@ -2626,7 +2790,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
 
             // Add event listeners for defense tool inputs
             const defInputIds = ['sosInput', 'defTroopsInput', 'defWorldInput', 'defMinTimeBefore',
-                                 'defSupportSpears', 'defSupportSwords', 'defSupportHeavy'];
+                                 'defSupportSpears', 'defSupportSwords', 'defSupportHeavy',
+                                 'defSupportArchers', 'defSupportMarchers'];
 
             defInputIds.forEach(id => {
                 const element = document.getElementById(id);
@@ -2716,13 +2881,14 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     continue;
                 }
 
-                // Parse attack lines
-                const attackMatch = line.match(/\[command\]attack\[\/command\].*?\[coord\](\d+)\|(\d+)\[\/coord\].*?Ankunftszeit:\s*(\d{2}\.\d{2}\.\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+                // Parse attack lines — matches attack, attack_large, attack_small, etc.
+                const attackMatch = line.match(/\[command\]attack[^\[]*\[\/command\].*?\[coord\](\d+)\|(\d+)\[\/coord\].*?Ankunftszeit:\s*(\d{2}\.\d{2}\.\d{2})\s+(\d{2}:\d{2}:\d{2})(?::(\d+))?/);
                 if (attackMatch && currentVillage) {
                     const attackerX = parseInt(attackMatch[1]);
                     const attackerY = parseInt(attackMatch[2]);
                     const dateStr = attackMatch[3]; // DD.MM.YY
                     const timeStr = attackMatch[4]; // HH:MM:SS
+                    const msRaw = attackMatch[5];   // optional ms (e.g. 512)
 
                     // Parse date
                     const dateParts = dateStr.split('.');
@@ -2733,14 +2899,16 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     const hour = parseInt(timeParts[0]);
                     const minute = parseInt(timeParts[1]);
                     const second = parseInt(timeParts[2]);
+                    const ms = worldConfig.hasMilliseconds ? (parseInt(msRaw) || 0) : 0;
 
-                    const arrivalTime = new Date(year, month, day, hour, minute, second);
+                    const arrivalTime = new Date(year, month, day, hour, minute, second, ms);
+                    const msStr = msRaw ? `:${msRaw}` : '';
 
                     attacks.push({
                         targetVillage: currentVillage,
                         attackerCoords: { x: attackerX, y: attackerY },
                         arrivalTime: arrivalTime,
-                        arrivalTimeStr: `${dateStr} ${timeStr}`
+                        arrivalTimeStr: `${dateStr} ${timeStr}${msStr}`
                     });
                 }
             }
@@ -2822,8 +2990,14 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                             }
                         }
 
-                        // We need at least 10 troop values (spears through nobles)
-                        if (troopNumbers.length >= 10) {
+                        // Column offsets from worldConfig (same logic as parseStandardTroops)
+                        // No archers: [spy=3 light=4 heavy=5 ram=6 cat=7 noble=8] (need >=9)
+                        // With archers: [bow=3 spy=4 light=5 marcher=6 heavy=7 ram=8 cat=9 noble=10] (need >=11)
+                        const da = worldConfig.hasArchers ? 1 : 0;
+                        const db = worldConfig.hasArchers ? 2 : 0;
+                        const minTroopCount = worldConfig.hasArchers ? 11 : 9;
+
+                        if (troopNumbers.length >= minTroopCount) {
                             const villageData = {
                                 name: villageName,
                                 coords: `${coordMatch[1]}|${coordMatch[2]}`,
@@ -2832,12 +3006,14 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                                 spears: troopNumbers[0] || 0,
                                 swords: troopNumbers[1] || 0,
                                 axes: troopNumbers[2] || 0,
-                                spies: troopNumbers[3] || 0,
-                                light: troopNumbers[4] || 0,
-                                heavy: troopNumbers[5] || 0,
-                                rams: troopNumbers[6] || 0,
-                                catapults: troopNumbers[7] || 0,
-                                nobles: troopNumbers[9] || 0
+                                archers: worldConfig.hasArchers ? (troopNumbers[3] || 0) : 0,
+                                spies: troopNumbers[3 + da] || 0,
+                                light: troopNumbers[4 + da] || 0,
+                                marchers: worldConfig.hasArchers ? (troopNumbers[6] || 0) : 0,
+                                heavy: troopNumbers[5 + db] || 0,
+                                rams: troopNumbers[6 + db] || 0,
+                                catapults: troopNumbers[7 + db] || 0,
+                                nobles: troopNumbers[8 + db] || 0
                             };
                             troops.push(villageData);
                             console.log(`Parsed village ${villageData.name} (${villageData.coords}) eigene troops:`, villageData);
@@ -2857,6 +3033,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
             const spearsPerSupport = parseInt(document.getElementById('defSupportSpears').value) || 0;
             const swordsPerSupport = parseInt(document.getElementById('defSupportSwords').value) || 0;
             const heavyPerSupport = parseInt(document.getElementById('defSupportHeavy').value) || 0;
+            const archersPerSupport = worldConfig.hasArchers ? (parseInt(document.getElementById('defSupportArchers').value) || 0) : 0;
+            const marchersPerSupport = worldConfig.hasArchers ? (parseInt(document.getElementById('defSupportMarchers').value) || 0) : 0;
             const useTimeOptimization = document.getElementById('defUseTimeOptimization').checked;
             const outputFormat = document.querySelector('input[name="defOutputFormat"]:checked').value;
 
@@ -2907,6 +3085,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     spears: 0,
                     swords: 0,
                     heavy: 0,
+                    archers: 0,
+                    marchers: 0,
                     rams: 0,
                     catapults: 0
                 });
@@ -2945,6 +3125,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     const availableSpears = village.spears - used.spears;
                     const availableSwords = village.swords - used.swords;
                     const availableHeavy = village.heavy - used.heavy;
+                    const availableArchers = (village.archers || 0) - (used.archers || 0);
+                    const availableMarchers = (village.marchers || 0) - (used.marchers || 0);
                     const availableRams = village.rams - used.rams;
                     const availableCatapults = village.catapults - used.catapults;
 
@@ -2952,6 +3134,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                         availableSpears,
                         availableSwords,
                         availableHeavy,
+                        availableArchers,
+                        availableMarchers,
                         availableRams,
                         availableCatapults,
                         requiredSpears: spearsPerSupport,
@@ -2962,8 +3146,10 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     // Check if village has enough troops
                     if (availableSpears < spearsPerSupport ||
                         availableSwords < swordsPerSupport ||
-                        availableHeavy < heavyPerSupport) {
-                        const reason = `Insufficient troops (have: ${availableSpears}/${availableSwords}/${availableHeavy}, need: ${spearsPerSupport}/${swordsPerSupport}/${heavyPerSupport})`;
+                        availableHeavy < heavyPerSupport ||
+                        availableArchers < archersPerSupport ||
+                        availableMarchers < marchersPerSupport) {
+                        const reason = `Insufficient troops (have: ${availableSpears}/${availableSwords}/${availableHeavy}/${availableArchers}/${availableMarchers}, need: ${spearsPerSupport}/${swordsPerSupport}/${heavyPerSupport}/${archersPerSupport}/${marchersPerSupport})`;
                         console.log(`    ❌ ${reason}`);
                         rejectionReasons.push(`${village.coords}: ${reason}`);
                         continue;
@@ -2976,12 +3162,12 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     );
 
                     // Determine the slowest unit among the troops being sent
-                    // Speeds: spear=18, sword=22, heavy=11 (sword is slowest!)
+                    // Speeds: spear=18, sword=22, heavy=11, archer=18, marcher=18 (sword is slowest!)
                     let baseSlowestUnit = 'heavy';
                     if (swordsPerSupport > 0) {
-                        baseSlowestUnit = 'sword';  // 22 min/field - slowest of the three
-                    } else if (spearsPerSupport > 0) {
-                        baseSlowestUnit = 'spear';  // 18 min/field
+                        baseSlowestUnit = 'sword';  // 22 min/field - slowest of the group
+                    } else if (spearsPerSupport > 0 || archersPerSupport > 0 || marchersPerSupport > 0) {
+                        baseSlowestUnit = spearsPerSupport > 0 ? 'spear' : archersPerSupport > 0 ? 'archer' : 'marcher';
                     }
                     // else use heavy (11 min/field)
 
@@ -2990,6 +3176,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                         spears: spearsPerSupport,
                         swords: swordsPerSupport,
                         heavy: heavyPerSupport,
+                        archers: archersPerSupport,
+                        marchers: marchersPerSupport,
                         rams: 0,
                         catapults: 0,
                         slowestUnit: baseSlowestUnit
@@ -2997,7 +3185,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
 
                     // Calculate base travel time with the actual slowest unit
                     const baseTravelTime = calculateTravelTime(distance, baseSlowestUnit);
-                    let sendTime = new Date(attack.arrivalTime.getTime() - baseTravelTime * 60000);
+                    const _defMsOff = worldConfig.hasMilliseconds ? worldConfig.msOffset : 0;
+                    let sendTime = new Date(attack.arrivalTime.getTime() - travelDurationMs(distance, baseSlowestUnit) + _defMsOff);
                     let timeUntilSend = sendTime.getTime() - now.getTime();
 
                     console.log(`    Distance: ${distance.toFixed(2)} fields`);
@@ -3032,7 +3221,7 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                         // Try adding a ram if available
                         if (availableRams > 0) {
                             const travelTimeWithRam = calculateTravelTime(distance, 'ram');
-                            const sendTimeWithRam = new Date(attack.arrivalTime.getTime() - travelTimeWithRam * 60000);
+                            const sendTimeWithRam = new Date(attack.arrivalTime.getTime() - travelDurationMs(distance, 'ram') + _defMsOff);
                             const timeUntilSendWithRam = sendTimeWithRam.getTime() - now.getTime();
 
                             console.log(`      Ram option: travel=${travelTimeWithRam}min, send=${formatDateTime(sendTimeWithRam)}`);
@@ -3052,7 +3241,7 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                         // Try adding a catapult if available and no ram was better
                         if (availableCatapults > 0 && bestOption.rams === 0) {
                             const travelTimeWithCatapult = calculateTravelTime(distance, 'catapult');
-                            const sendTimeWithCatapult = new Date(attack.arrivalTime.getTime() - travelTimeWithCatapult * 60000);
+                            const sendTimeWithCatapult = new Date(attack.arrivalTime.getTime() - travelDurationMs(distance, 'catapult') + _defMsOff);
                             const timeUntilSendWithCatapult = sendTimeWithCatapult.getTime() - now.getTime();
 
                             console.log(`      Catapult option: travel=${travelTimeWithCatapult}min, send=${formatDateTime(sendTimeWithCatapult)}`);
@@ -3084,6 +3273,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                         spears: bestOption.spears,
                         swords: bestOption.swords,
                         heavy: bestOption.heavy,
+                        archers: bestOption.archers,
+                        marchers: bestOption.marchers,
                         rams: bestOption.rams,
                         catapults: bestOption.catapults,
                         slowestUnit: bestOption.slowestUnit,
@@ -3096,6 +3287,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                     used.spears += bestOption.spears;
                     used.swords += bestOption.swords;
                     used.heavy += bestOption.heavy;
+                    used.archers += bestOption.archers;
+                    used.marchers += bestOption.marchers;
                     used.rams += bestOption.rams;
                     used.catapults += bestOption.catapults;
 
@@ -3146,6 +3339,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                                       support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
 
                     let troopText = `${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavallerie`;
+                    if (support.archers > 0) troopText += `, ${support.archers} Bogenschützen`;
+                    if (support.marchers > 0) troopText += `, ${support.marchers} Berittene Bogenschützen`;
                     if (support.rams > 0) {
                         troopText += `, ${support.rams} Rammbock`;
                     }
@@ -3200,7 +3395,7 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
 
             // Statistics
             const totalTroopsSent = validSupports.reduce((sum, s) =>
-                sum + s.spears + s.swords + s.heavy + (s.rams || 0) + (s.catapults || 0), 0);
+                sum + s.spears + s.swords + s.heavy + (s.archers || 0) + (s.marchers || 0) + (s.rams || 0) + (s.catapults || 0), 0);
             const totalRams = validSupports.reduce((sum, s) => sum + (s.rams || 0), 0);
             const totalCatapults = validSupports.reduce((sum, s) => sum + (s.catapults || 0), 0);
 
@@ -3258,6 +3453,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                                       support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
 
                     let troopText = `${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere Kavallerie`;
+                    if (support.archers > 0) troopText += `, ${support.archers} Bogenschützen`;
+                    if (support.marchers > 0) troopText += `, ${support.marchers} Berittene Bogenschützen`;
                     if (support.rams > 0) {
                         troopText += `, ${support.rams} Rammbock`;
                     }
@@ -3328,7 +3525,9 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                 const troops = {};
                 if (support.spears > 0) troops.spear = support.spears.toString();
                 if (support.swords > 0) troops.sword = support.swords.toString();
+                if (support.archers > 0) troops.archer = support.archers.toString();
                 if (support.heavy > 0) troops.heavy = support.heavy.toString();
+                if (support.marchers > 0) troops.marcher = support.marchers.toString();
                 if (support.rams > 0) troops.ram = support.rams.toString();
                 if (support.catapults > 0) troops.catapult = support.catapults.toString();
 
@@ -3376,6 +3575,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                                       support.catapults > 0 ? ' (+ 1 Katapult für optimales Timing)' : '';
 
                     let troopText = `${support.spears} Speere, ${support.swords} Schwerter, ${support.heavy} Schwere`;
+                    if (support.archers > 0) troopText += `, ${support.archers} Bogenschützen`;
+                    if (support.marchers > 0) troopText += `, ${support.marchers} Berittene Bogenschützen`;
                     if (support.rams > 0) {
                         troopText += `, ${support.rams} Rammbock`;
                     }
@@ -3517,6 +3718,10 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
+            if (worldConfig.hasMilliseconds) {
+                const ms = String(date.getMilliseconds()).padStart(3, '0');
+                return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}:${ms}`;
+            }
             return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
         }
 
@@ -3553,6 +3758,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                 defSupportSpears: document.getElementById('defSupportSpears').value,
                 defSupportSwords: document.getElementById('defSupportSwords').value,
                 defSupportHeavy: document.getElementById('defSupportHeavy').value,
+                defSupportArchers: document.getElementById('defSupportArchers').value,
+                defSupportMarchers: document.getElementById('defSupportMarchers').value,
                 defTroopFormat: defTroopFormat,
                 defOutputFormat: document.querySelector('input[name="defOutputFormat"]:checked').value
             };
@@ -3580,6 +3787,8 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
                 if (formData.defSupportSpears) document.getElementById('defSupportSpears').value = formData.defSupportSpears;
                 if (formData.defSupportSwords) document.getElementById('defSupportSwords').value = formData.defSupportSwords;
                 if (formData.defSupportHeavy) document.getElementById('defSupportHeavy').value = formData.defSupportHeavy;
+                if (formData.defSupportArchers !== undefined) document.getElementById('defSupportArchers').value = formData.defSupportArchers;
+                if (formData.defSupportMarchers !== undefined) document.getElementById('defSupportMarchers').value = formData.defSupportMarchers;
 
                 // Restore format selections
                 if (formData.defTroopFormat) {
@@ -3632,5 +3841,24 @@ Roter Punkt von [b]BetterCallSaul[/b] aus [coord]527|564[/coord] mit [unit]snob[
         }
 
     </script>
+
+    <!-- Manual village data input modal — at body level so it works from any tab -->
+    <div id="manualInputModal" onclick="hideManualInput()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div onclick="event.stopPropagation();" style="background: rgba(30, 41, 59, 0.95); padding: 30px; border-radius: 16px; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto; backdrop-filter: blur(10px); border: 1px solid rgba(71, 85, 105, 0.3);">
+            <h3 style="color: #f59e0b; margin-bottom: 20px;">📝 Manuelle Dorfdata-Eingabe</h3>
+            <p id="manualInstructions" style="color: #cbd5e1; margin-bottom: 15px; line-height: 1.5;">
+                <strong>Anleitung:</strong><br>
+                1. Öffnen Sie <strong>https://de230.die-staemme.de/map/village.txt</strong> in einem neuen Tab<br>
+                2. Kopieren Sie den kompletten Inhalt (Strg+A, dann Strg+C)<br>
+                3. Fügen Sie ihn in das Textfeld unten ein<br>
+                4. Klicken Sie auf "Daten laden"
+            </p>
+            <textarea id="manualVillageData" placeholder="Fügen Sie hier die CSV-Daten ein..." style="width: 100%; height: 200px; font-family: monospace; font-size: 11px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(71, 85, 105, 0.4); border-radius: 8px; color: #e2e8f0; padding: 10px;"></textarea>
+            <div style="margin-top: 15px; text-align: center;">
+                <button onclick="loadManualVillageData()" style="margin-right: 10px;">Daten laden</button>
+                <button onclick="hideManualInput()" style="background: linear-gradient(135deg, #6b7280, #4b5563);">Abbrechen</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
